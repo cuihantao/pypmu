@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 from distutils.core import setup
-
+try:
+    import setuptools
+except ImportError:
+    pass
 setup(name='pypmu',
       version='0.1.1',
       description='Python-based PMU simulator',
