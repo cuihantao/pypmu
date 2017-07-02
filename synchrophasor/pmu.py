@@ -73,7 +73,7 @@ class Pmu(object):
         self.cfg1.set_id_code(pmu_id)
         self.cfg2.set_id_code(pmu_id)
         # self.cfg3.set_id_code(id)
- 
+
         # Configuration changed - Notify all PDCs about new configuration
         self.send(self.cfg2)
         # self.send(self.cfg3)

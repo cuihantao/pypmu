@@ -1782,7 +1782,7 @@ class ConfigFrame2(ConfigFrame1):
         return cfg
 
 
-class ConfigFrame3(CommonFrame):
+class ConfigFrame3(ConfigFrame1):
     """
     ## ConfigFrame3 ##
 
@@ -1803,6 +1803,7 @@ class ConfigFrame3(CommonFrame):
     * ``soc`` **(int)** - UNIX timestamp. Default value: ``None``. Inherited from ``CommonFrame``.
     * ``frasec`` **(int)** - Fraction of second and Time Quality. Default value: ``None``.
       Inherited from ``CommonFrame``.
+    * ``cont_index`` (int) - continuation index for fragmented frames.!
     * ``time_base`` **(int)** - Resolution of the fractional second time stamp in all frames.
     * ``num_pmu`` **(int)** - Number of PMUs (data streams) included in single ``DataFrame``.
     * ``multistreaming`` **(bool)** - ``True`` if ``num_pmu > 1``. That means data frame consist of multiple
@@ -1810,6 +1811,7 @@ class ConfigFrame3(CommonFrame):
     * ``station_name`` **(mixed)** - Station name ``(string)`` or station names ``(list)`` if ``multistreaming``.
     * ``id_code`` **(mixed)** - Measurement stream ID code ``(int)`` or ``(list)`` if ``multistreaming``. Each ID
       identifies source PMU of each data block.
+    * ``g_pmu_id`` ? global pmu id.
     * ``data_format`` **(mixed)** - Data format for each data stream. Inherited from ``CommonFrame``.
     * ``phasor_num`` **(mixed)** - Number of phasors ``(int)`` or ``(list)`` if ``multistreaming``.
     * ``analog_num`` **(mixed)** - Number of analog values ``(int)`` or ``(list)`` if ``multistreaming``.
@@ -1819,6 +1821,12 @@ class ConfigFrame3(CommonFrame):
     * ``ph_units`` **(list)** - Conversion factor for phasor channels. If ``multistreaming`` list of lists.
     * ``an_units`` **(list)** - Conversion factor for analog channels. If ``multistreaming`` list of lists.
     * ``dig_units`` **(list)** - Mask words for digital status word. If ``multistreaming`` list of lists.
+    * ``pmu_lat`` **float** - Latitude for pmu.
+    * ``pmu_lon`` **float** - Longitude for pmu
+    * ``pmu_elev`` **float** - Pmu elevation in meters.
+    * ``svc_class`` **char** service class, either M or P
+    * ``window`` int - phasor measurement unit window length in microseconds
+    * ``grp_delay`` int - group delay in microseconds
     * ``fnom``  **(mixed)** - Nominal frequency code and flags. If ``multistreaming`` list of ints.
     * ``cfg_count`` **(mixed)** - Configuration change count. If ``multistreaming`` list of ints.
     * ``data_rate`` **(int)** - Frames per second or seconds per frame (if negative ``int``).
@@ -1828,7 +1836,27 @@ class ConfigFrame3(CommonFrame):
         FrameError
     When it's not possible to create valid frame, usually due invalid parameter value.
     """
-    pass  # TODO: Implement Configuration Frame v3
+    def __init__(self, version=1, pmu_id_code, soc=None, fracsec=None, cont_index, time_base, num_pmu, station_name, id_code, g_pmu_id, data_format,
+                 phasor_num, analog_num, digital_num, channel_names, ph_units, an_units, dig_units, pmu_lat, pmu_long, pmu_elev, svc_class, window,
+                 grp_delay, fnom, cfg_count, data_rate):
+
+        super().__init__(pmu_id_code, time_base, num_pmu, station_name, id_code, data_format, phasor_num, analog_num,
+                         digital_num, channel_names, ph_units, an_units, dig_units, f_nom, cfg_count,
+                         data_rate, soc, frasec, version)
+        super().set_frame_type("cfg3")
+        self.set_cont_index(cont_index)
+        self.set_g_pmu_id(g_pmu_id)
+        self.set_pmu_lat(pmu_lat)
+        self.set_pmu_lon(pmu_long)
+        self.set_pmu_elev(pmu_elev)
+        self.set_svc_class(svc_class)
+        self.set_window(window)
+        self.set_grp_delay(grp_delay)
+
+        @staticmethod
+        def convert2frame(byte_data):
+            pass
+    # TODO: Implement Configuration Frame v3
 
 
 class DataFrame(CommonFrame):
@@ -2015,7 +2043,7 @@ class DataFrame(CommonFrame):
                 for i, stream_phasors in enumerate(phasors):
 
                     if not self.cfg.get_data_format()[i][1]:  # If not float representation scale back
-                        stream_phasors = [tuple([ph*self.cfg.get_ph_units()[i][j][0]*0.00001 for ph in phasor]) 
+                        stream_phasors = [tuple([ph*self.cfg.get_ph_units()[i][j][0]*0.00001 for ph in phasor])
                                           for j, phasor in enumerate(stream_phasors)]
 
                         phasors[i] = stream_phasors
@@ -2027,7 +2055,7 @@ class DataFrame(CommonFrame):
             phasors = [DataFrame._int2phasor(phasor, self.cfg._data_format) for phasor in self._phasors]
 
             if not self.cfg.get_data_format()[1]:  # If not float representation scale back
-                phasors = [tuple([ph*self.cfg.get_ph_units()[i][0]*0.00001 for ph in phasor]) 
+                phasors = [tuple([ph*self.cfg.get_ph_units()[i][0]*0.00001 for ph in phasor])
                            for i, phasor in enumerate(phasors)]
 
             if not self.cfg.get_data_format()[0]:  # If not polar convert to polar representation
