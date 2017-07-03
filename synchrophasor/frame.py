@@ -1572,6 +1572,10 @@ class ConfigFrame1(CommonFrame):
 
     @staticmethod
     def convert2frame(byte_data):
+        if pmu_id_code == "cfg3"
+            cfg3 = True
+        else:
+            cfg3 = False
 
         try:
 
@@ -1661,6 +1665,10 @@ class ConfigFrame1(CommonFrame):
                 id_code = int.from_bytes(byte_data[start_byte:start_byte+2], byteorder="big", signed=False)
                 start_byte += 2
 
+                if cfg3:
+                    g_pmu_id = int.from_bytes(byte_data[start_byte:start_byte+16], "big")
+                    start_byte += 16
+
                 data_format_int = int.from_bytes(byte_data[start_byte:start_byte+2], byteorder="big", signed=False)
                 data_format = data_format_int & 0x000f  # Take only first 4 LSB bits
                 start_byte += 2
@@ -1696,6 +1704,21 @@ class ConfigFrame1(CommonFrame):
                     dig_units.append(ConfigFrame1._int2digunit(
                                 int.from_bytes(byte_data[start_byte:start_byte+4], byteorder="big", signed=False)))
                     start_byte += 4
+                if cfg3:
+                    pmu_lat = float()
+                    start_byte += 4
+
+                    pmu_lon =
+                    start_byte += 4
+
+                    pmu_elev =
+                    start_byte += 4
+
+                    svc_class =
+                    start_byte += 1
+
+                    window =
+                    start_byte += 4
 
                 fnom = ConfigFrame1._int2fnom(int.from_bytes(byte_data[start_byte:start_byte + 2],
                                                              byteorder="big", signed=False))
@@ -1706,9 +1729,14 @@ class ConfigFrame1(CommonFrame):
 
             data_rate = int.from_bytes(byte_data[-4:-2], byteorder="big", signed=True)
 
-            return ConfigFrame1(pmu_code, time_base, num_pmu, station_name, id_code, data_format, phasor_num,
+            if !cfg3:
+                return ConfigFrame1(pmu_code, time_base, num_pmu, station_name, id_code, data_format, phasor_num,
                                 analog_num, digital_num, channel_names, ph_units, an_units, dig_units, fnom, cfg_count,
                                 data_rate, soc, frasec)
+            else:
+                return ConfigFrame3(pmu_code, time_base, num_pmu, station_name, id_code, g_pmu_id, data_format, phasor_num,
+                                    analog_num, digital_num, channel_names, ph_units, an_units, dig_units, pmu_lat, pmu_long,
+                                    pmu_elev, svc_class, window, grp_delay, fnom, cfg_count, datarate, soc, fracsec)
 
         except Exception as error:
             raise FrameError("Error while creating Config frame: " + str(error))
@@ -1836,26 +1864,91 @@ class ConfigFrame3(ConfigFrame1):
         FrameError
     When it's not possible to create valid frame, usually due invalid parameter value.
     """
-    def __init__(self, version=1, pmu_id_code, soc=None, fracsec=None, cont_index, time_base, num_pmu, station_name, id_code, g_pmu_id, data_format,
-                 phasor_num, analog_num, digital_num, channel_names, ph_units, an_units, dig_units, pmu_lat, pmu_long, pmu_elev, svc_class, window,
-                 grp_delay, fnom, cfg_count, data_rate):
+    def __init__(self, pmu_id_code, cont_index, time_base, num_pmu, station_name, id_code, g_pmu_id, data_format,
+                 phasor_num, analog_num, digital_num, channel_names, ph_units, an_units, dig_units, pmu_lat, pmu_lon, pmu_elev, svc_class, window,
+                 grp_delay, fnom, cfg_count, data_rate, version=1, soc=None, fracsec=None):
 
         super().__init__(pmu_id_code, time_base, num_pmu, station_name, id_code, data_format, phasor_num, analog_num,
-                         digital_num, channel_names, ph_units, an_units, dig_units, f_nom, cfg_count,
-                         data_rate, soc, frasec, version)
+                         digital_num, channel_names, ph_units, an_units, dig_units, fnom, cfg_count,
+                         data_rate, soc, fracsec, version)
         super().set_frame_type("cfg3")
         self.set_cont_index(cont_index)
         self.set_g_pmu_id(g_pmu_id)
         self.set_pmu_lat(pmu_lat)
-        self.set_pmu_lon(pmu_long)
+        self.set_pmu_lon(pmu_lon)
         self.set_pmu_elev(pmu_elev)
         self.set_svc_class(svc_class)
         self.set_window(window)
         self.set_grp_delay(grp_delay)
 
-        @staticmethod
-        def convert2frame(byte_data):
-            pass
+    def set_cont_index(self, index):
+        if index >= 0 and index <= 65535:
+            self.cont_index = index
+        else:
+            raise "Continuation index out of bounds, or invalid."
+
+    def set_g_pmu_id(self, gid):
+        self.g_pmu_id = gid
+
+    def set_pmu_lat(self, lat):
+        self.pmu_lat = lat
+
+    def set_pmu_lon(self, lon):
+        self.pmu_lon = lon
+
+    def set_pmu_elev(self, elev):
+        self.pmu_elev = elev
+
+    def set_svc_class(self, svc):
+        if svc == "M" or svc == "P":
+            self.svc_class = svc
+        else:
+            raise "SVC must be either M or P."
+
+    def set_window(self, win):
+        self.window = win
+
+    def set_grp_delay(self, grpdelay):
+        self.grp_delay = grpdelay
+
+    def convert2bytes(self):
+        if not self._multistreaming: ## ??? some things out of order, where is sync bit
+            cfg_b = self.cont_index.to_bytes(2, "big") + self._time_base.to_bytes(4, "big") + self._num_pmu.to_bytes(2, "big") + \
+                    str.encode(self._station_name) + self._id_code.to_bytes(2, "big") + \
+                    self.g_pmu_id.to_bytes(16, "big") + self._data_format.to_bytes(2, "big") + self._phasor_num.to_bytes(2, "big") + \
+                    self._analog_num.to_bytes(2, "big") + self._digital_num.to_bytes(2, "big") + \
+                    str.encode("".join(self._channel_names)) + list2bytes(self._ph_units, 4) + \
+                    list2bytes(self._an_units, 4) + list2bytes(self._dig_units, 4) + \
+                    self.pmu_lat.to_bytes(4, "big") + self.pmu_lon.to_bytes(4, "big") + \
+                    self.pmu_elev.to_bytes(4, "big") + str.encode(self.svc_class) + \
+                    self.window.to_bytes(4, "big", signed = True) + self.grp_delay.to_bytes(4, "big", signed = True) + \
+                    self._f_nom.to_bytes(2, "big") + self._cfg_count.to_bytes(2, "big") + \
+                    self._data_rate.to_bytes(2, "big", signed=True)
+        else:
+
+            cfg_b = self._time_base.to_bytes(4, "big") + self._num_pmu.to_bytes(2, "big")
+
+            # Concatenate configurations as many as num_pmu tells
+            for i in range(self._num_pmu):
+                cfg_b_i = str.encode(self._station_name[i]) + self._id_code[i].to_bytes(2, "big") + \
+                        self.g_pmu_id[i].to_bytes(16, "big") +
+                        self._data_format[i].to_bytes(2, "big") + self._phasor_num[i].to_bytes(2, "big") + \
+                        self._analog_num[i].to_bytes(2, "big") + self._digital_num[i].to_bytes(2, "big") + \
+                        str.encode("".join(self._channel_names[i])) + list2bytes(self._ph_units[i], 4) + \
+                        list2bytes(self._an_units[i], 4) + list2bytes(self._dig_units[i], 4) + \
+                        self.pmu_lat[i].to_bytes(4, "big") + self.pmu_lon[i].to_bytes(4, "big") + \
+                        self.pmu_elev[i].to_bytes(4, "big") + str.encode(self.svc_class[i]) + \
+                        self.window[i].to_bytes(4, "big", signed = True) + self.grp_delay[i].to_bytes(4, "big", signed = True) + \
+                        self._f_nom[i].to_bytes(2, "big") + self._cfg_count[i].to_bytes(2, "big")
+
+                cfg_b += cfg_b_i
+
+            cfg_b += self._data_rate.to_bytes(2, "big", signed=True)
+
+        return super().convert2bytes(cfg_b)
+
+    def convert2frame(self, byte_data):
+
     # TODO: Implement Configuration Frame v3
 
 
@@ -2163,7 +2256,7 @@ class DataFrame(CommonFrame):
         return freq
 
 
-    def _freq2int(freq, data_format):
+    def _freq2int(self, freq, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2181,7 +2274,7 @@ class DataFrame(CommonFrame):
         return freq
 
 
-    def _int2freq(freq, data_format):
+    def _int2freq(self, freq, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2224,7 +2317,7 @@ class DataFrame(CommonFrame):
         return dfreq
 
 
-    def _dfreq2int(dfreq, data_format):
+    def _dfreq2int(self, dfreq, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2239,7 +2332,7 @@ class DataFrame(CommonFrame):
         return dfreq
 
 
-    def _int2dfreq(dfreq, data_format):
+    def _int2dfreq(self, dfreq, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2298,7 +2391,7 @@ class DataFrame(CommonFrame):
         return analog
 
 
-    def _analog2int(analog, data_format):
+    def _analog2int(self, analog, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2314,7 +2407,7 @@ class DataFrame(CommonFrame):
         return analog
 
 
-    def _int2analog(analog, data_format):
+    def _int2analog(self, analog, data_format):
 
         if isinstance(data_format, int):
             data_format = DataFrame._int2format(data_format)
@@ -2363,7 +2456,7 @@ class DataFrame(CommonFrame):
         return self._digital
 
 
-    def _digital2int(digital):
+    def _digital2int(self, digital):
 
         if not -32767 <= digital <= 65535:
             raise ValueError("DIGITAL must be 16 bit word. -32767 <= DIGITAL <= 65535.")
