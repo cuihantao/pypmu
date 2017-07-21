@@ -189,6 +189,66 @@ class Pmu(object):
         for buffer in self.client_buffers:
             buffer.put(data_frame)
 
+    def send_data_file(self, filename1, filename2):##for use with Hantao Cui's Andes.
+
+        if filename1[len(filename1)-3:len(filename1)] != "lst" or filename2[len(filename2)-3:len(filename2)] != "dat":
+            raise Exception("Usage: .lst file, .dat file, stat, cfg")
+        ##need phasors, analog, and digital parameters. Or at least phasors?
+        phasors = []
+        num_pmu = self.cfg2.get_num_pmu()
+        id_code = self.cfg2.get_id_code()
+        data_format = self.cfg2.get_data_format()
+        phasor_num = self.cfg2.get_phasor_num()
+        analog_num = self.cfg2.get_analog_num()
+        digital_num = self.cfg2.get_digital_num()
+        vmIndexes = []
+        amIndexes = []
+        wBusFreqIndexes = []
+        xtBusFreqIndexes = []
+        thetaBusIndexes = []
+        vmBusIndexes = []
+
+        lst = open(filename1, "r")
+        dat = open(filename2, "r")
+        num_lines = int(lst.readline(1))
+
+        for i in range(1, num_lines):## get indexes
+            line = lst.readline(i)
+            if "vm PMU" in line:
+                vmIndexes.append(i)
+            elif "am PMU" in line:
+                amIndexes.append(i)
+            elif "w BusFreq" in line:
+                wBusFreqIndexes.append(i)
+            elif "xt BusFreq" in line:
+                xtBusFreqIndexes.append(i)
+            elif "theta Bus" in line:
+                thetaBusIndexes.append(i)
+            elif "vm Bus" in line:
+                vmBusIndexes.append(i)
+
+
+        for i in range(2, num_lines):
+            if self.cfg2._multistreaming:
+                for j in range(2,num_lines):##retrieve values
+                    line = dat.readline(j)
+                    line = line.split()
+                    for k in range(phasor_num):
+                        if data_format[0]:##polar
+                            phasors.append(float(line[vmIndexes[k]]), float(line[amIndexes[k]]))
+                        else:
+                            phasors.append(float(line[amIndexes[k]]), float(line[vmIndexes[k]]))
+                            freq = float(line[wBusFreqIndexes[k]])
+            else:
+                for j in range(2, num_lines):
+                    line = dat.readline(j)
+                    line = line.split()
+                    if data_format[0]:
+                        phasors = (line[vmIndexes[0]], line[amIndexes[0]])
+                    else:
+                        phasors = (line[amIndexes[0]], line[vmIndexes[0]])
+                    freq = line[wBusFreqIndexes[0]]
+            self.send_data(phasors)
 
     def run(self):
 
