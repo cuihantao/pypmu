@@ -2293,7 +2293,6 @@ class DataFrame(CommonFrame):
 
             for phasor_measurement in phasors:
                 phasors_list.append(DataFrame._phasor2int(phasor_measurement, self.cfg._data_format))
-
         self._phasors = phasors_list
 
 

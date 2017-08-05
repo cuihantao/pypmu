@@ -1,5 +1,5 @@
-import logging
 import socket
+import logging
 import linecache
 
 from select import select
@@ -162,33 +162,44 @@ class Pmu(object):
 
     def send_data(self, phasors=[], analog=[], digital=[], freq=0, dfreq=0,
                   stat=("ok", True, "timestamp", False, False, False, 0, "<10", 0), soc=None, frasec=None):
-
+        #TODO: I broke this, going to put a bandaid on this until I get an internet connection
+        i = 0
         # PH_UNIT conversion
+        #print("initial parameter for phasors: ", phasors)
         if phasors and self.cfg2.get_num_pmu() > 1:  # Check if multistreaming:
+            #print("inside if that checks if multistreaming")
             if not (self.cfg2.get_num_pmu() == len(self.cfg2.get_data_format()) == len(phasors)):
                 raise PmuError("Incorrect input. Please provide PHASORS as list of lists with NUM_PMU elements.")
-
-            for i, df in self.cfg2.get_data_format():
+            for df in self.cfg2.get_data_format():
                 if not df[1]:  # Check if phasor representation is integer
                     phasors[i] = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units()[i])), phasors[i])
-        elif not self.cfg2.get_data_format()[1]:
-            phasors = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units())), phasors)
-
+                    print("phasors in send data method: ", phasors)
+                elif not self.cfg2.get_data_format()[1]:
+                    phasors = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units())), phasors)
+                    print("phasors in send data method: ", phasors)
+                i += 1
+                if i > self.cfg2.get_num_pmu():
+                    i = 0
+                    break
         # AN_UNIT conversion
         if analog and self.cfg2.get_num_pmu() > 1:  # Check if multistreaming:
             if not (self.cfg2.get_num_pmu() == len(self.cfg2.get_data_format()) == len(analog)):
                 raise PmuError("Incorrect input. Please provide analog ANALOG as list of lists with NUM_PMU elements.")
 
-            for i, df in self.cfg2.get_data_format():
+            for df in self.cfg2.get_data_format():
                 if not df[2]:  # Check if analog representation is integer
                     analog[i] = map(lambda x: int(x / self.cfg2.get_analog_units()[i]), analog[i])
+                i += 1
+                if i > self.cfg2.get_num_pmu():
+                    i = 0
+                    break
         elif not self.cfg2.get_data_format()[2]:
             analog = map(lambda x: int(x / self.cfg2.get_analog_units()), analog)
-
         data_frame = DataFrame(self.cfg2.get_id_code(), stat, phasors, freq, dfreq, analog, digital, self.cfg2)
 
         for buffer in self.client_buffers:
             buffer.put(data_frame)
+            print("buffer put")
 
     def run(self):
 
@@ -307,6 +318,7 @@ class Pmu(object):
                 if command:
                     if command == "start":
                         sending_measurements_enabled = True
+                        print("\n**start sending activated**\n")
                         logger.info("[%d] - Start sending -> (%s:%d)", pmu_id, address[0], address[1])
 
                     elif command == "stop":
@@ -359,14 +371,23 @@ class Pmu(object):
 
         if filename1[len(filename1)-3:len(filename1)] != "lst" or filename2[len(filename2)-3:len(filename2)] != "dat":
             raise Exception("Usage: .lst file, .dat file, stat, cfg")
-        ##need phasors, analog, and digital parameters. Or at least phasors?
+        ##TODO: Remove lazy hardcoding to default values for send_data func call
         phasors = []
+        index = 2
         num_pmu = self.cfg2.get_num_pmu()
         id_code = self.cfg2.get_id_code()
         data_format = self.cfg2.get_data_format()
         phasor_num = self.cfg2.get_phasor_num()
         analog_num = self.cfg2.get_analog_num()
         digital_num = self.cfg2.get_digital_num()
+        stat = ("ok", True, "timestamp", False, False, False, 0, "<10", 0)
+        stat2 = []
+        for i in range(num_pmu):
+            stat2.append(stat)
+        print(len(stat))
+        print(stat)
+        alist2 = []
+
         vmIndexes = []
         amIndexes = []
         wBusFreqIndexes = []
@@ -377,7 +398,7 @@ class Pmu(object):
         lst = open(filename1, "r")
         dat = open(filename2, "r")
         ##print(lst.read())
-        num_lines = int(dat.readline())
+        num_lines = int(dat.readline())##number of columns, AKA num of vars
         lst.close()
         dat.close()
 
@@ -396,27 +417,43 @@ class Pmu(object):
             elif "vm Bus" in line:
                 vmBusIndexes.append(i-1)
 
-        for i in range(2, num_lines):
+        while True:##value retrieval. loop inside while represents 1 line of data, 1 data frame, 1 phasor per pmu?.
             if self.cfg2._multistreaming:
-                for j in range(2,num_lines):##retrieve values
-                    line = dat.readline(j)
-                    line = line.split()
-                    for k in range(phasor_num):
-                        if data_format[0]:##polar
-                            phasors.append(float(line[vmIndexes[k]]), float(line[amIndexes[k]]))
-                        else:
-                            phasors.append(float(line[amIndexes[k]]), float(line[vmIndexes[k]]))
-                            freq = float(line[wBusFreqIndexes[k]])
-            else:
-                for j in range(2, num_lines):
-                    line = dat.readline(j)
-                    line = line.split()
-                    if data_format[0]:
-                        phasors = (line[vmIndexes[0]], line[amIndexes[0]])
+                line = linecache.getline(filename2, index)
+                line = line.split()
+                if len(line) == 0:
+                    break
+                for k in range(num_pmu):
+                    if data_format[0]:##polar
+                        phasors.append((float(line[vmIndexes[k]]), float(line[amIndexes[k]])))
                     else:
-                        phasors = (line[amIndexes[0]], line[vmIndexes[0]])
-                    freq = line[wBusFreqIndexes[0]]
-            self.send_data(phasors)
+                        phasors.append((float(line[amIndexes[k]]), float(line[vmIndexes[k]])))
+                        freq = float(line[wBusFreqIndexes[k]])
+                for j in range(len(phasors)):
+                    alist = []
+                    alist.append(phasors[j])
+                    alist2.append(alist)
+                    alist = []
+                if index > 2:
+                    del alist2[:len(alist2)-14]
+                #print(alist2)
+                self.send_data(alist2, [[]]*14, [[]]*14, [0]*14, [0]*14, stat2)
+                alist2 = []
+            else:
+                line = linecache.getline(filename2, index)
+                line = line.split()
+                if len(line) == 0:
+                    break
+                if data_format[0]:
+                    phasors = (float(line[vmIndexes[0]]), float(line[amIndexes[0]]))
+                else:
+                    phasors = (float(line[amIndexes[0]]), (float(line[vmIndexes[0]])))
+                freq = line[wBusFreqIndexes[0]]
+                #print(phasors)
+                self.send_data(phasors)
+            index += 1
+            print("iteration ", index-2)
+            alist2 = []
 
 
 class PmuError(BaseException):
