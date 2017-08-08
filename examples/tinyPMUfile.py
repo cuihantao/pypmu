@@ -11,7 +11,7 @@ be sent.
 
 if __name__ == "__main__":
 
-    pmu = Pmu(ip="127.0.0.1", port=1411)
+    pmu = Pmu(ip="127.0.0.1", port=1410)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
@@ -30,7 +30,6 @@ if __name__ == "__main__":
         ph_units2.append(ph_units)
     an_units = [[]]*14
     dig_units = [[]]*14
-    print(an_units)
     fnom = [50]*14
     cfgcount = [1]*14
 

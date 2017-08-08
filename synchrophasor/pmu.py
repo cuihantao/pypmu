@@ -172,6 +172,7 @@ class Pmu(object):
                 raise PmuError("Incorrect input. Please provide PHASORS as list of lists with NUM_PMU elements.")
             for df in self.cfg2.get_data_format():
                 if not df[1]:  # Check if phasor representation is integer
+                    print("2nd if not")
                     phasors[i] = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units()[i])), phasors[i])
                     print("phasors in send data method: ", phasors)
                 elif not self.cfg2.get_data_format()[1]:
@@ -196,10 +197,10 @@ class Pmu(object):
         elif not self.cfg2.get_data_format()[2]:
             analog = map(lambda x: int(x / self.cfg2.get_analog_units()), analog)
         data_frame = DataFrame(self.cfg2.get_id_code(), stat, phasors, freq, dfreq, analog, digital, self.cfg2)
+        #print(self.client_buffers)
 
         for buffer in self.client_buffers:
             buffer.put(data_frame)
-            print("buffer put")
 
     def run(self):
 
@@ -220,7 +221,7 @@ class Pmu(object):
     def acceptor(self):
 
         while True:
-
+            print("acceptor method")
             self.logger.info("[%d] - Waiting for connection on %s:%d", self.cfg2.get_id_code(), self.ip, self.port)
 
             # Accept a connection on the bound socket and fork a child process to handle it.
@@ -254,12 +255,12 @@ class Pmu(object):
 
         # Recreate Logger (handler implemented as static method due to Windows process spawning issues)
         logger = logging.getLogger(address[0]+str(address[1]))
-        logger.setLevel(log_level)
+        logger.setLevel(10)
         handler = logging.StreamHandler(stdout)
         formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-
+        print("pdc handler")
         logger.info("[%d] - Connection from %s:%d", pmu_id, address[0], address[1])
 
         # Wait for start command from connected PDC/PMU to start sending
@@ -270,6 +271,7 @@ class Pmu(object):
             delay = 1.0 / data_rate
         else:
             delay = -data_rate
+            print(delay)
 
         try:
             while True:
@@ -355,7 +357,7 @@ class Pmu(object):
                     if isinstance(data, CommonFrame):  # If not raw bytes convert to bytes
                         if set_timestamp: data.set_time()
                         data = data.convert2bytes()
-
+                    print("data in pdc handler:", data)
                     sleep(delay)
                     connection.sendall(data)
                     logger.debug("[%d] - Message sent at [%f] -> (%s:%d)",
@@ -384,8 +386,8 @@ class Pmu(object):
         stat2 = []
         for i in range(num_pmu):
             stat2.append(stat)
-        print(len(stat))
-        print(stat)
+        #print(len(stat))
+        #print(stat)
         alist2 = []
 
         vmIndexes = []
@@ -395,11 +397,11 @@ class Pmu(object):
         thetaBusIndexes = []
         vmBusIndexes = []
 
-        lst = open(filename1, "r")
+        # lst = open(filename1, "r")
         dat = open(filename2, "r")
         ##print(lst.read())
         num_lines = int(dat.readline())##number of columns, AKA num of vars
-        lst.close()
+        # lst.close()
         dat.close()
 
         for i in range(num_lines):## get indexes
@@ -452,7 +454,7 @@ class Pmu(object):
                 #print(phasors)
                 self.send_data(phasors)
             index += 1
-            print("iteration ", index-2)
+            #print("iteration ", index-2)
             alist2 = []
 
 
