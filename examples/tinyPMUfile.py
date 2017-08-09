@@ -10,24 +10,18 @@ be sent.
 
 
 if __name__ == "__main__":
-
-    pmu = Pmu(ip="127.0.0.1", port=1410)
+##TODO: support for non-multistreaming here.
+    pmu = Pmu(ip="127.0.0.1", port=1411)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
                                                            "Station K", "Station L", "Station M", "Station N"]
     phasor_ids = [1]*14
     data_format = [(True, True, True, True)] * 14
-    #channel_names = [["These","Names","Are","For","Testing","Purposes","Only",
-    #                 "Please","Disregard","These","Names","That","Are","Here"]]
-    channel_names = ["aname!"]
-    channel_names2 = []
-    for i in range(14):
-        channel_names2.append(channel_names)
-    ph_units = [(915527, "v")]
-    ph_units2 = []
-    for i in range(14):
-        ph_units2.append(ph_units)
+
+    channel_names = [["aname!"]] * 14
+    ph_units = [[(915527, "v")]] * 14
+
     an_units = [[]]*14
     dig_units = [[]]*14
     fnom = [50]*14
@@ -35,9 +29,8 @@ if __name__ == "__main__":
 
     cfg = ConfigFrame2(7734, 1000000, 14, station_names, phasor_ids, data_format,
                                           phasor_ids, [0]*14, [0]*14,
-                                         channel_names2,
-                                         ph_units2,
-                                         #[(1, "pow"), (1, "rms"), (1, "peak")], [(0x0000, 0xffff)],
+                                         channel_names,
+                                         ph_units,
                                          an_units,
                                          dig_units, fnom, cfgcount, 30)
 

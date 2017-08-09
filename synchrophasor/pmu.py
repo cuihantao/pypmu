@@ -162,22 +162,16 @@ class Pmu(object):
 
     def send_data(self, phasors=[], analog=[], digital=[], freq=0, dfreq=0,
                   stat=("ok", True, "timestamp", False, False, False, 0, "<10", 0), soc=None, frasec=None):
-        #TODO: I broke this, going to put a bandaid on this until I get an internet connection
         i = 0
         # PH_UNIT conversion
-        #print("initial parameter for phasors: ", phasors)
         if phasors and self.cfg2.get_num_pmu() > 1:  # Check if multistreaming:
-            #print("inside if that checks if multistreaming")
             if not (self.cfg2.get_num_pmu() == len(self.cfg2.get_data_format()) == len(phasors)):
                 raise PmuError("Incorrect input. Please provide PHASORS as list of lists with NUM_PMU elements.")
             for df in self.cfg2.get_data_format():
                 if not df[1]:  # Check if phasor representation is integer
-                    print("2nd if not")
                     phasors[i] = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units()[i])), phasors[i])
-                    print("phasors in send data method: ", phasors)
                 elif not self.cfg2.get_data_format()[1]:
                     phasors = map(lambda x: int(x / (0.00001 * self.cfg2.get_ph_units())), phasors)
-                    print("phasors in send data method: ", phasors)
                 i += 1
                 if i > self.cfg2.get_num_pmu():
                     i = 0
@@ -197,7 +191,6 @@ class Pmu(object):
         elif not self.cfg2.get_data_format()[2]:
             analog = map(lambda x: int(x / self.cfg2.get_analog_units()), analog)
         data_frame = DataFrame(self.cfg2.get_id_code(), stat, phasors, freq, dfreq, analog, digital, self.cfg2)
-        #print(self.client_buffers)
 
         for buffer in self.client_buffers:
             buffer.put(data_frame)
@@ -221,7 +214,6 @@ class Pmu(object):
     def acceptor(self):
 
         while True:
-            print("acceptor method")
             self.logger.info("[%d] - Waiting for connection on %s:%d", self.cfg2.get_id_code(), self.ip, self.port)
 
             # Accept a connection on the bound socket and fork a child process to handle it.
@@ -255,12 +247,11 @@ class Pmu(object):
 
         # Recreate Logger (handler implemented as static method due to Windows process spawning issues)
         logger = logging.getLogger(address[0]+str(address[1]))
-        logger.setLevel(10)
+        logger.setLevel(log_level)
         handler = logging.StreamHandler(stdout)
         formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        print("pdc handler")
         logger.info("[%d] - Connection from %s:%d", pmu_id, address[0], address[1])
 
         # Wait for start command from connected PDC/PMU to start sending
@@ -271,7 +262,6 @@ class Pmu(object):
             delay = 1.0 / data_rate
         else:
             delay = -data_rate
-            print(delay)
 
         try:
             while True:
@@ -320,7 +310,6 @@ class Pmu(object):
                 if command:
                     if command == "start":
                         sending_measurements_enabled = True
-                        print("\n**start sending activated**\n")
                         logger.info("[%d] - Start sending -> (%s:%d)", pmu_id, address[0], address[1])
 
                     elif command == "stop":
@@ -357,7 +346,6 @@ class Pmu(object):
                     if isinstance(data, CommonFrame):  # If not raw bytes convert to bytes
                         if set_timestamp: data.set_time()
                         data = data.convert2bytes()
-                    print("data in pdc handler:", data)
                     sleep(delay)
                     connection.sendall(data)
                     logger.debug("[%d] - Message sent at [%f] -> (%s:%d)",
@@ -373,21 +361,16 @@ class Pmu(object):
 
         if filename1[len(filename1)-3:len(filename1)] != "lst" or filename2[len(filename2)-3:len(filename2)] != "dat":
             raise Exception("Usage: .lst file, .dat file, stat, cfg")
-        ##TODO: Remove lazy hardcoding to default values for send_data func call
+        ##TODO: Replace hardcoding of send_data method.
         phasors = []
         index = 2
         num_pmu = self.cfg2.get_num_pmu()
-        id_code = self.cfg2.get_id_code()
         data_format = self.cfg2.get_data_format()
         phasor_num = self.cfg2.get_phasor_num()
         analog_num = self.cfg2.get_analog_num()
         digital_num = self.cfg2.get_digital_num()
-        stat = ("ok", True, "timestamp", False, False, False, 0, "<10", 0)
-        stat2 = []
-        for i in range(num_pmu):
-            stat2.append(stat)
-        #print(len(stat))
-        #print(stat)
+        stat = [("ok", True, "timestamp", False, False, False, 0, "<10", 0)] * num_pmu
+
         alist2 = []
 
         vmIndexes = []
@@ -397,11 +380,8 @@ class Pmu(object):
         thetaBusIndexes = []
         vmBusIndexes = []
 
-        # lst = open(filename1, "r")
         dat = open(filename2, "r")
-        ##print(lst.read())
         num_lines = int(dat.readline())##number of columns, AKA num of vars
-        # lst.close()
         dat.close()
 
         for i in range(num_lines):## get indexes
@@ -438,8 +418,7 @@ class Pmu(object):
                     alist = []
                 if index > 2:
                     del alist2[:len(alist2)-14]
-                #print(alist2)
-                self.send_data(alist2, [[]]*14, [[]]*14, [0]*14, [0]*14, stat2)
+                self.send_data(alist2, [[]]*14, [[]]*14, [0]*14, [0]*14, stat)
                 alist2 = []
             else:
                 line = linecache.getline(filename2, index)
@@ -451,12 +430,9 @@ class Pmu(object):
                 else:
                     phasors = (float(line[amIndexes[0]]), (float(line[vmIndexes[0]])))
                 freq = line[wBusFreqIndexes[0]]
-                #print(phasors)
                 self.send_data(phasors)
             index += 1
-            #print("iteration ", index-2)
             alist2 = []
-
 
 class PmuError(BaseException):
     pass
