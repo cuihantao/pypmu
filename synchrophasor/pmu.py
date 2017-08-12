@@ -1,6 +1,7 @@
 import socket
 import logging
 import linecache
+import multiprocessing
 
 from select import select
 from threading import Thread
@@ -357,6 +358,7 @@ class Pmu(object):
             connection.close()
             logger.info("[%d] - Connection from %s:%d has been closed.", pmu_id, address[0], address[1])
 
+
     def send_data_file(self, filename1, filename2):##for use with Hantao Cui's Andes.
 
         if filename1[len(filename1)-3:len(filename1)] != "lst" or filename2[len(filename2)-3:len(filename2)] != "dat":
@@ -383,6 +385,7 @@ class Pmu(object):
         dat = open(filename2, "r")
         num_lines = int(dat.readline())##number of columns, AKA num of vars
         dat.close()
+
 
         for i in range(num_lines):## get indexes
             line = linecache.getline(filename1, i)
@@ -433,6 +436,132 @@ class Pmu(object):
                 self.send_data(phasors)
             index += 1
             alist2 = []
+
+class DataFile(object):
+    """Contains variables needed by methods performing file operations. """
+    ##TODO: Support for multiple class instances of PMU's for multiport streaming
+    def __init__(self, port, pmu, datFile, lstFile):
+        self.set_pmu(pmu)
+        self.set_ports(port)
+        self.set_dat_file(datFile)
+        self.set_lst_file(lstFile)
+        self.get_col_indexes(lstFile)
+        self.data_format = self.pmu.cfg2.get_data_format()
+        self.send = False
+
+    def run(self):
+        """Starts the data reading/sending process."""
+        self.read_data_file()
+
+    def read_data_file(self):
+        """Reads a line of data from file provided. Starts send data function as a child
+        process that sends the slice of data as it is being read. """
+        index = 2
+        self.line = linecache.getline(self.datFile, index)
+        index += 1
+        thread = Thread(target=self.send_data_file,)
+        self.send = True
+        thread.start()
+
+        while True:
+            self.line = linecache.getline(self.datFile, index)
+            if self.line == "":
+                break
+                self.send = False
+            index += 1
+            print(index)
+
+        thread.join()
+
+    def send_data_file(self):
+        """Child process of read_data_file. Uses column indexes and slice of data
+        to construct and send a data frame."""
+        while self.send:
+            line = self.line.split()
+            print(line)
+            if len(line) != self.num_col:
+                raise Exception("The data string does not correspond to the number of variables.")
+                break
+            alist2 = []
+            phasors = []
+            stat = [("ok", True, "timestamp", False, False, False, 0, "<10", 0)] * self.num_pmu
+
+            if self.pmu.cfg2._multistreaming:
+                for k in range(self.num_pmu):
+                    if self.data_format[0]:##polar
+                        phasors.append((float(line[self.vmIndexes[k]]), float(line[self.amIndexes[k]])))
+                    else:
+                        phasors.append((float(line[self.amIndexes[k]]), float(line[self.vmIndexes[k]])))
+                        freq = float(line[self.wBusFreqIndexes[k]])
+                for j in range(len(phasors)):
+                    alist = []
+                    alist.append(phasors[j])
+                    alist2.append(alist)
+                    alist = []
+                self.pmu.send_data(alist2, [[]]*14, [[]]*14, [0]*14, [0]*14, stat)
+            else:
+                if self.data_format[0]:
+                    phasors = (float(line[self.vmIndexes[0]]), float(line[self.amIndexes[0]]))
+                else:
+                    phasors = (float(line[self.amIndexes[0]]), (float(line[self.vmIndexes[0]])))
+                freq = line[self.wBusFreqIndexes[0]]
+                self.pmu.send_data(phasors)
+
+    def get_col_indexes(self, lstFile):
+        """Using lst file, retrieves indexes of columns that corerspond to
+        variables present in the dat file."""
+        self.vmIndexes = []
+        self.amIndexes = []
+        self.wBusFreqIndexes = []
+        self.xtBusFreqIndexes = []
+        self.thetaBusIndexes = []
+        self.vmBusIndexes = []
+
+        for i in range(self.num_col):## get indexes
+            line = linecache.getline(lstFile, i)
+            if "vm PMU" in line:
+                self.vmIndexes.append(i-1)
+            elif "am PMU" in line:
+                self.amIndexes.append(i-1)
+            elif "w BusFreq" in line:
+                self.wBusFreqIndexes.append(i-1)
+            elif "xt BusFreq" in line:
+                self.xtBusFreqIndexes.append(i-1)
+            elif "theta Bus" in line:
+                self.thetaBusIndexes.append(i-1)
+            elif "vm Bus" in line:
+                self.vmBusIndexes.append(i-1)
+
+    def set_pmu(self, pmu):
+        self.pmu = pmu
+        self.num_pmu = pmu.cfg2.get_num_pmu()
+
+    def set_ports(self, ports):
+        self.ports = ports
+        if ports < self.num_pmu:
+            raise Exception("Cannot be more ports than PMU's")
+
+    def set_dat_file(self, datFile):
+        """datFile is a string with the name of the file in use."""
+        if datFile[len(datFile)-3:len(datFile)] != "dat":
+            raise Exception(".dat filetype is required")
+        self.datFile = datFile
+
+        dat = open(datFile, "r")
+        self.num_col = int(dat.readline())##number of columns, AKA num of vars
+        dat.close()
+
+    def set_lst_file(self, lstFile):
+        """string representing name of .lst file wtih variables"""
+        if lstFile[len(lstFile)-3:len(lstFile)] != "lst":
+            raise Exception("lst filetype required.")
+        self.lstFile = lstFile
+
+    @staticmethod
+    def parse_cfg(lstFile):
+        """Reads the lst file and retrieves information needed for config and
+        sending the data."""
+        pass
 
 class PmuError(BaseException):
     pass

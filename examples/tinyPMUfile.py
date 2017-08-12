@@ -1,4 +1,4 @@
-from synchrophasor.pmu import Pmu
+from synchrophasor.pmu import *
 from synchrophasor.frame import ConfigFrame2
 
 """
@@ -10,7 +10,7 @@ be sent.
 
 
 if __name__ == "__main__":
-##TODO: support for non-multistreaming here.
+##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
     pmu = Pmu(ip="127.0.0.1", port=1411)
     pmu.logger.setLevel("DEBUG")
 
@@ -38,10 +38,13 @@ if __name__ == "__main__":
 
     pmu.set_header()  # This will load default header message "Hello I'm tinyPMU!"
 
+    data_file = DataFile(1411,pmu,"ieee14_vsc_wtg_out.dat", "ieee14_vsc_wtg_out.lst")
+
     pmu.run()  # PMU starts listening for incoming connections
 
     while True:
         if pmu.clients:  # Check if there is any connected PDCs
-            pmu.send_data_file("ieee14_vsc_wtg_out.lst", "ieee14_vsc_wtg_out.dat")
+            data_file.read_data_file()
+            break
 
     pmu.join()
