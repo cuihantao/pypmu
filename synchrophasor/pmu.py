@@ -68,6 +68,7 @@ class Pmu(object):
         self.method = method
         self.clients = []
         self.client_buffers = []
+        self.sending_measurements_enabled = False
 
 
     def set_id(self, pmu_id):
@@ -81,7 +82,6 @@ class Pmu(object):
         # self.send(self.cfg3)
 
         self.logger.info("[%d] - PMU Id changed.", self.cfg2.get_id_code())
-
 
     def set_configuration(self, config=None):
 
@@ -469,7 +469,6 @@ class DataFile(object):
                 break
                 self.send = False
             index += 1
-            print(index)
 
         thread.join()
 

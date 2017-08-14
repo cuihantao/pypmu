@@ -11,7 +11,7 @@ be sent.
 
 if __name__ == "__main__":
 ##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
-    pmu = Pmu(ip="127.0.0.1", port=1411)
+    pmu = Pmu(ip="127.0.0.1", port=1410)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
@@ -34,6 +34,7 @@ if __name__ == "__main__":
                                          an_units,
                                          dig_units, fnom, cfgcount, 30)
 
+
     pmu.set_configuration(cfg)
 
     pmu.set_header()  # This will load default header message "Hello I'm tinyPMU!"
@@ -45,6 +46,5 @@ if __name__ == "__main__":
     while True:
         if pmu.clients:  # Check if there is any connected PDCs
             data_file.read_data_file()
-            break
 
     pmu.join()
