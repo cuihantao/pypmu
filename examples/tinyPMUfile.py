@@ -1,5 +1,6 @@
-from synchrophasor.pmu import *
+from synchrophasor.pmu import Pmu
 from synchrophasor.frame import ConfigFrame2
+from synchrophasor.file import DataFile
 
 """
 tinyPMU will listen on ip:port for incoming connections.
@@ -11,7 +12,7 @@ be sent.
 
 if __name__ == "__main__":
 ##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
-    pmu = Pmu(ip="127.0.0.1", port=1410)
+    pmu = Pmu(ip="127.0.0.1", port=1411)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
@@ -45,6 +46,7 @@ if __name__ == "__main__":
 
     while True:
         if pmu.clients:  # Check if there is any connected PDCs
-            data_file.read_data_file()
+            data_file.run()
+            break
 
     pmu.join()
