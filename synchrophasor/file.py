@@ -53,7 +53,7 @@ class DataFile(object):
         while self.send:
             line = linecache.getline(self.datFile, index)
             if line == "":
-                line.checkcache(self.datFile)        ##Refreshes file contents
+                linecache.checkcache(self.datFile)        ##Refreshes file contents
                 sleep(0.1)
                 time += 0.1
                 if time > self.timeout:
@@ -159,4 +159,3 @@ class DataFile(object):
     def parse_cfg(lstFile):
         """Reads the lst file and retrieves information needed for config and
         sending the data."""
-        pass
