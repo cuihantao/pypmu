@@ -79,6 +79,7 @@ class DataFile(object):
                     raise Exception("The data string does not correspond to the number of variables.")
             alist2 = []
             phasors = []
+            freq = []
             stat = [("ok", True, "timestamp", False, False, False, 0, "<10", 0)] * self.num_pmu
 
             if self.pmu.cfg2._multistreaming:
@@ -87,13 +88,14 @@ class DataFile(object):
                         phasors.append((float(line[self.vmIndexes[k]]), float(line[self.amIndexes[k]])))
                     else:
                         phasors.append((float(line[self.amIndexes[k]]), float(line[self.vmIndexes[k]])))
-                        freq = float(line[self.wBusFreqIndexes[k]])
+                    freq.append(float(line[self.wBusFreqIndexes[k]]))
+                    print(freq)
                 for j in range(len(phasors)):
                     alist = []
                     alist.append(phasors[j])
                     alist2.append(alist)
                     alist = []
-                self.pmu.send_data(alist2, [[]]*14, [[]]*14, [0]*14, [0]*14, stat)
+                self.pmu.send_data(alist2, [[]]*14, [[]]*14, freq, [0]*14, stat)
                 sleep(self.delay)
             else:
                 if self.data_format[0]:
@@ -101,7 +103,7 @@ class DataFile(object):
                 else:
                     phasors = (float(line[self.amIndexes[0]]), (float(line[self.vmIndexes[0]])))
                 freq = line[self.wBusFreqIndexes[0]]
-                self.pmu.send_data(phasors)
+                self.pmu.send_data(phasors, [], [], freq)
                 sleep(self.delay)
         print("Write thread complete.")
 

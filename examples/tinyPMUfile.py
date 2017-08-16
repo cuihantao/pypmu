@@ -12,7 +12,7 @@ be sent.
 
 if __name__ == "__main__":
 ##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
-    pmu = Pmu(ip="127.0.0.1", port=1410)
+    pmu = Pmu(ip="127.0.0.1", port=1411)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
