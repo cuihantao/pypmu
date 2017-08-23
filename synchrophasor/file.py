@@ -88,7 +88,7 @@ class DataFile(object):
                         phasors.append((float(line[self.vmIndexes[k]]), float(line[self.amIndexes[k]])))
                     else:
                         phasors.append((float(line[self.amIndexes[k]]), float(line[self.vmIndexes[k]])))
-                    freq.append(float(line[self.wBusFreqIndexes[k]]))
+                    freq.append(float(line[self.wBusFreqIndexes[k]])*self.pmu.cfg2.get_fnom()[k])
                     print(freq)
                 for j in range(len(phasors)):
                     alist = []
@@ -102,8 +102,8 @@ class DataFile(object):
                     phasors = (float(line[self.vmIndexes[0]]), float(line[self.amIndexes[0]]))
                 else:
                     phasors = (float(line[self.amIndexes[0]]), (float(line[self.vmIndexes[0]])))
-                freq = line[self.wBusFreqIndexes[0]]
-                self.pmu.send_data(phasors, [], [], freq)
+                freq = float(line[self.wBusFreqIndexes[0]])
+                self.pmu.send_data(phasors, [], [], freq*self.pmu.cfg2.get_fnom()[k])
                 sleep(self.delay)
         print("Write thread complete.")
 
