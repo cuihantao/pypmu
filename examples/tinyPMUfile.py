@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     an_units = [[]]*14
     dig_units = [[]]*14
-    fnom = [50]*14
+    fnom = [60]*14
     cfgcount = [1]*14
 
     cfg = ConfigFrame2(7734, 1000000, 14, station_names, phasor_ids, data_format,
