@@ -1,0 +1,283 @@
+     0,                  Time [s],               $Time\ [s]$
+     1,                    vC C 1,                $vC\ C\ 1$
+     2,                    vC C 2,                $vC\ C\ 2$
+     3,                    vC C 3,                $vC\ C\ 3$
+     4,                    vC C 3,                $vC\ C\ 3$
+     5,                IL RLs 1-2,           $I_L\ RLs\ 1-2$
+     6,                IL RLs 2-3,           $I_L\ RLs\ 2-3$
+     7,                IL RLs 3-4,           $I_L\ RLs\ 3-4$
+     8,                IL RLs 1-4,           $I_L\ RLs\ 1-4$
+     9,              xt BusFreq 1,    $x_\theta\ BusFreq\ 1$
+    10,               w BusFreq 1,      $\omega\ BusFreq\ 1$
+    11,              xt BusFreq 2,    $x_\theta\ BusFreq\ 2$
+    12,               w BusFreq 2,      $\omega\ BusFreq\ 2$
+    13,              xt BusFreq 3,    $x_\theta\ BusFreq\ 3$
+    14,               w BusFreq 3,      $\omega\ BusFreq\ 3$
+    15,              xt BusFreq 4,    $x_\theta\ BusFreq\ 4$
+    16,               w BusFreq 4,      $\omega\ BusFreq\ 4$
+    17,              xt BusFreq 5,    $x_\theta\ BusFreq\ 5$
+    18,               w BusFreq 5,      $\omega\ BusFreq\ 5$
+    19,              xt BusFreq 6,    $x_\theta\ BusFreq\ 6$
+    20,               w BusFreq 6,      $\omega\ BusFreq\ 6$
+    21,              xt BusFreq 7,    $x_\theta\ BusFreq\ 7$
+    22,               w BusFreq 7,      $\omega\ BusFreq\ 7$
+    23,              xt BusFreq 8,    $x_\theta\ BusFreq\ 8$
+    24,               w BusFreq 8,      $\omega\ BusFreq\ 8$
+    25,              xt BusFreq 9,    $x_\theta\ BusFreq\ 9$
+    26,               w BusFreq 9,      $\omega\ BusFreq\ 9$
+    27,             xt BusFreq 10,   $x_\theta\ BusFreq\ 10$
+    28,              w BusFreq 10,     $\omega\ BusFreq\ 10$
+    29,             xt BusFreq 11,   $x_\theta\ BusFreq\ 11$
+    30,              w BusFreq 11,     $\omega\ BusFreq\ 11$
+    31,             xt BusFreq 12,   $x_\theta\ BusFreq\ 12$
+    32,              w BusFreq 12,     $\omega\ BusFreq\ 12$
+    33,             xt BusFreq 13,   $x_\theta\ BusFreq\ 13$
+    34,              w BusFreq 13,     $\omega\ BusFreq\ 13$
+    35,             xt BusFreq 14,   $x_\theta\ BusFreq\ 14$
+    36,              w BusFreq 14,     $\omega\ BusFreq\ 14$
+    37,                  vm PMU 1,             $V_m\ PMU\ 1$
+    38,                  am PMU 1,        $\theta_m\ PMU\ 1$
+    39,                  vm PMU 2,             $V_m\ PMU\ 2$
+    40,                  am PMU 2,        $\theta_m\ PMU\ 2$
+    41,                  vm PMU 3,             $V_m\ PMU\ 3$
+    42,                  am PMU 3,        $\theta_m\ PMU\ 3$
+    43,                  vm PMU 4,             $V_m\ PMU\ 4$
+    44,                  am PMU 4,        $\theta_m\ PMU\ 4$
+    45,                  vm PMU 5,             $V_m\ PMU\ 5$
+    46,                  am PMU 5,        $\theta_m\ PMU\ 5$
+    47,                  vm PMU 6,             $V_m\ PMU\ 6$
+    48,                  am PMU 6,        $\theta_m\ PMU\ 6$
+    49,                  vm PMU 7,             $V_m\ PMU\ 7$
+    50,                  am PMU 7,        $\theta_m\ PMU\ 7$
+    51,                  vm PMU 8,             $V_m\ PMU\ 8$
+    52,                  am PMU 8,        $\theta_m\ PMU\ 8$
+    53,                  vm PMU 9,             $V_m\ PMU\ 9$
+    54,                  am PMU 9,        $\theta_m\ PMU\ 9$
+    55,                 vm PMU 10,            $V_m\ PMU\ 10$
+    56,                 am PMU 10,       $\theta_m\ PMU\ 10$
+    57,                 vm PMU 11,            $V_m\ PMU\ 11$
+    58,                 am PMU 11,       $\theta_m\ PMU\ 11$
+    59,                 vm PMU 12,            $V_m\ PMU\ 12$
+    60,                 am PMU 12,       $\theta_m\ PMU\ 12$
+    61,                 vm PMU 13,            $V_m\ PMU\ 13$
+    62,                 am PMU 13,       $\theta_m\ PMU\ 13$
+    63,                 vm PMU 14,            $V_m\ PMU\ 14$
+    64,                 am PMU 14,       $\theta_m\ PMU\ 14$
+    65,               delta Syn_1,           $\delta\ Syn_1$
+    66,               omega Syn_1,           $\omega\ Syn_1$
+    67,               delta Syn_2,           $\delta\ Syn_2$
+    68,               omega Syn_2,           $\omega\ Syn_2$
+    69,               delta Syn_3,           $\delta\ Syn_3$
+    70,               omega Syn_3,           $\omega\ Syn_3$
+    71,               delta Syn_6,           $\delta\ Syn_6$
+    72,               omega Syn_6,           $\omega\ Syn_6$
+    73,               delta Syn_8,           $\delta\ Syn_8$
+    74,               omega Syn_8,           $\omega\ Syn_8$
+    75,                 xg1 TG1 1,          $x_{g1}\ TG1\ 1$
+    76,                 xg2 TG1 1,          $x_{g2}\ TG1\ 1$
+    77,                 xg3 TG1 1,          $x_{g3}\ TG1\ 1$
+    78,                 xg1 TG1 2,          $x_{g1}\ TG1\ 2$
+    79,                 xg2 TG1 2,          $x_{g2}\ TG1\ 2$
+    80,                 xg3 TG1 2,          $x_{g3}\ TG1\ 2$
+    81,                  Nd VSC 1,             $N_d\ VSC\ 1$
+    82,                  Nq VSC 1,             $N_q\ VSC\ 1$
+    83,                Idcx VSC 1,         $I_{dcx}\ VSC\ 1$
+    84,                  ud VSC 1,             $u_d\ VSC\ 1$
+    85,                  uq VSC 1,             $u_q\ VSC\ 1$
+    86,                  Id VSC 1,             $I_d\ VSC\ 1$
+    87,                  Iq VSC 1,             $I_q\ VSC\ 1$
+    88,                  Md VSC 1,             $M_d\ VSC\ 1$
+    89,                  Mq VSC 1,             $M_q\ VSC\ 1$
+    90,                  Nd VSC 2,             $N_d\ VSC\ 2$
+    91,                  Nq VSC 2,             $N_q\ VSC\ 2$
+    92,                Idcx VSC 2,         $I_{dcx}\ VSC\ 2$
+    93,                  ud VSC 2,             $u_d\ VSC\ 2$
+    94,                  uq VSC 2,             $u_q\ VSC\ 2$
+    95,                  Id VSC 2,             $I_d\ VSC\ 2$
+    96,                  Iq VSC 2,             $I_q\ VSC\ 2$
+    97,                  Md VSC 2,             $M_d\ VSC\ 2$
+    98,                  Mq VSC 2,             $M_q\ VSC\ 2$
+    99,                  Nd VSC 3,             $N_d\ VSC\ 3$
+   100,                  Nq VSC 3,             $N_q\ VSC\ 3$
+   101,                Idcx VSC 3,         $I_{dcx}\ VSC\ 3$
+   102,                  ud VSC 3,             $u_d\ VSC\ 3$
+   103,                  uq VSC 3,             $u_q\ VSC\ 3$
+   104,                  Id VSC 3,             $I_d\ VSC\ 3$
+   105,                  Iq VSC 3,             $I_q\ VSC\ 3$
+   106,                  Md VSC 3,             $M_d\ VSC\ 3$
+   107,                  Mq VSC 3,             $M_q\ VSC\ 3$
+   108,                  ud VSC 4,             $u_d\ VSC\ 4$
+   109,                  uq VSC 4,             $u_q\ VSC\ 4$
+   110,                  Id VSC 4,             $I_d\ VSC\ 4$
+   111,                  Iq VSC 4,             $I_q\ VSC\ 4$
+   112,                  Md VSC 4,             $M_d\ VSC\ 4$
+   113,                  Mq VSC 4,             $M_q\ VSC\ 4$
+   114,                 adq VSC 4,     $\theta_{dq}\ VSC\ 4$
+   115,                  Nd VSC 4,             $N_d\ VSC\ 4$
+   116,                  Nq VSC 4,             $N_q\ VSC\ 4$
+   117,               theta Bus 1,          $\theta\ Bus\ 1$
+   118,               theta Bus 2,          $\theta\ Bus\ 2$
+   119,               theta Bus 3,          $\theta\ Bus\ 3$
+   120,               theta Bus 4,          $\theta\ Bus\ 4$
+   121,               theta Bus 5,          $\theta\ Bus\ 5$
+   122,               theta Bus 6,          $\theta\ Bus\ 6$
+   123,               theta Bus 7,          $\theta\ Bus\ 7$
+   124,               theta Bus 8,          $\theta\ Bus\ 8$
+   125,               theta Bus 9,          $\theta\ Bus\ 9$
+   126,              theta Bus 10,         $\theta\ Bus\ 10$
+   127,              theta Bus 11,         $\theta\ Bus\ 11$
+   128,              theta Bus 12,         $\theta\ Bus\ 12$
+   129,              theta Bus 13,         $\theta\ Bus\ 13$
+   130,              theta Bus 14,         $\theta\ Bus\ 14$
+   131,                  vm Bus 1,               $V\ Bus\ 1$
+   132,                  vm Bus 2,               $V\ Bus\ 2$
+   133,                  vm Bus 3,               $V\ Bus\ 3$
+   134,                  vm Bus 4,               $V\ Bus\ 4$
+   135,                  vm Bus 5,               $V\ Bus\ 5$
+   136,                  vm Bus 6,               $V\ Bus\ 6$
+   137,                  vm Bus 7,               $V\ Bus\ 7$
+   138,                  vm Bus 8,               $V\ Bus\ 8$
+   139,                  vm Bus 9,               $V\ Bus\ 9$
+   140,                 vm Bus 10,              $V\ Bus\ 10$
+   141,                 vm Bus 11,              $V\ Bus\ 11$
+   142,                 vm Bus 12,              $V\ Bus\ 12$
+   143,                 vm Bus 13,              $V\ Bus\ 13$
+   144,                 vm Bus 14,              $V\ Bus\ 14$
+   145,                Vdc Node 0,         $V_{dc}\ Node\ 0$
+   146,                Vdc Node 1,         $V_{dc}\ Node\ 1$
+   147,                Vdc Node 2,         $V_{dc}\ Node\ 2$
+   148,                Vdc Node 3,         $V_{dc}\ Node\ 3$
+   149,                Vdc Node 4,         $V_{dc}\ Node\ 4$
+   150,                I Ground 1,            $I\ Ground\ 1$
+   151,                Q PV Bus 2,           $Q\ PV\ Bus\ 2$
+   152,                Q PV Bus 3,           $Q\ PV\ Bus\ 3$
+   153,                Q PV Bus 6,           $Q\ PV\ Bus\ 6$
+   154,                Q PV Bus 8,           $Q\ PV\ Bus\ 8$
+   155,                Q SW_Bus_1,             $Q\ SW_Bus_1$
+   156,                P SW_Bus_1,             $P\ SW_Bus_1$
+   157,                   Idc C 1,            $I_{dc}\ C\ 1$
+   158,                   Idc C 2,            $I_{dc}\ C\ 2$
+   159,                   Idc C 3,            $I_{dc}\ C\ 3$
+   160,                   Idc C 3,            $I_{dc}\ C\ 3$
+   161,               Idc RLs 1-2,        $I_{dc}\ RLs\ 1-2$
+   162,               Idc RLs 2-3,        $I_{dc}\ RLs\ 2-3$
+   163,               Idc RLs 3-4,        $I_{dc}\ RLs\ 3-4$
+   164,               Idc RLs 1-4,        $I_{dc}\ RLs\ 1-4$
+   165,                 ash VSC 1,     $\theta_{sh}\ VSC\ 1$
+   166,                 vsh VSC 1,          $V_{sh}\ VSC\ 1$
+   167,                 psh VSC 1,          $P_{sh}\ VSC\ 1$
+   168,                 qsh VSC 1,          $Q_{sh}\ VSC\ 1$
+   169,                 pdc VSC 1,          $P_{dc}\ VSC\ 1$
+   170,                 Ish VSC 1,          $I_{sh}\ VSC\ 1$
+   171,                 ash VSC 2,     $\theta_{sh}\ VSC\ 2$
+   172,                 vsh VSC 2,          $V_{sh}\ VSC\ 2$
+   173,                 psh VSC 2,          $P_{sh}\ VSC\ 2$
+   174,                 qsh VSC 2,          $Q_{sh}\ VSC\ 2$
+   175,                 pdc VSC 2,          $P_{dc}\ VSC\ 2$
+   176,                 Ish VSC 2,          $I_{sh}\ VSC\ 2$
+   177,                 ash VSC 3,     $\theta_{sh}\ VSC\ 3$
+   178,                 vsh VSC 3,          $V_{sh}\ VSC\ 3$
+   179,                 psh VSC 3,          $P_{sh}\ VSC\ 3$
+   180,                 qsh VSC 3,          $Q_{sh}\ VSC\ 3$
+   181,                 pdc VSC 3,          $P_{dc}\ VSC\ 3$
+   182,                 Ish VSC 3,          $I_{sh}\ VSC\ 3$
+   183,                 ash VSC 4,     $\theta_{sh}\ VSC\ 4$
+   184,                 vsh VSC 4,          $V_{sh}\ VSC\ 4$
+   185,                 psh VSC 4,          $P_{sh}\ VSC\ 4$
+   186,                 qsh VSC 4,          $Q_{sh}\ VSC\ 4$
+   187,                 pdc VSC 4,          $P_{dc}\ VSC\ 4$
+   188,                 Ish VSC 4,          $I_{sh}\ VSC\ 4$
+   189,                   p Syn_1,                $P\ Syn_1$
+   190,                   q Syn_1,                $Q\ Syn_1$
+   191,                  pm Syn_1,              $P_m\ Syn_1$
+   192,                  vf Syn_1,              $V_f\ Syn_1$
+   193,                  Id Syn_1,              $I_d\ Syn_1$
+   194,                  Iq Syn_1,              $I_q\ Syn_1$
+   195,                  vd Syn_1,              $V_d\ Syn_1$
+   196,                  vq Syn_1,              $V_q\ Syn_1$
+   197,                psid Syn_1,           $\psi_d\ Syn_1$
+   198,                psiq Syn_1,           $\psi_q\ Syn_1$
+   199,                   p Syn_2,                $P\ Syn_2$
+   200,                   q Syn_2,                $Q\ Syn_2$
+   201,                  pm Syn_2,              $P_m\ Syn_2$
+   202,                  vf Syn_2,              $V_f\ Syn_2$
+   203,                  Id Syn_2,              $I_d\ Syn_2$
+   204,                  Iq Syn_2,              $I_q\ Syn_2$
+   205,                  vd Syn_2,              $V_d\ Syn_2$
+   206,                  vq Syn_2,              $V_q\ Syn_2$
+   207,                psid Syn_2,           $\psi_d\ Syn_2$
+   208,                psiq Syn_2,           $\psi_q\ Syn_2$
+   209,                   p Syn_3,                $P\ Syn_3$
+   210,                   q Syn_3,                $Q\ Syn_3$
+   211,                  pm Syn_3,              $P_m\ Syn_3$
+   212,                  vf Syn_3,              $V_f\ Syn_3$
+   213,                  Id Syn_3,              $I_d\ Syn_3$
+   214,                  Iq Syn_3,              $I_q\ Syn_3$
+   215,                  vd Syn_3,              $V_d\ Syn_3$
+   216,                  vq Syn_3,              $V_q\ Syn_3$
+   217,                psid Syn_3,           $\psi_d\ Syn_3$
+   218,                psiq Syn_3,           $\psi_q\ Syn_3$
+   219,                   p Syn_6,                $P\ Syn_6$
+   220,                   q Syn_6,                $Q\ Syn_6$
+   221,                  pm Syn_6,              $P_m\ Syn_6$
+   222,                  vf Syn_6,              $V_f\ Syn_6$
+   223,                  Id Syn_6,              $I_d\ Syn_6$
+   224,                  Iq Syn_6,              $I_q\ Syn_6$
+   225,                  vd Syn_6,              $V_d\ Syn_6$
+   226,                  vq Syn_6,              $V_q\ Syn_6$
+   227,                psid Syn_6,           $\psi_d\ Syn_6$
+   228,                psiq Syn_6,           $\psi_q\ Syn_6$
+   229,                   p Syn_8,                $P\ Syn_8$
+   230,                   q Syn_8,                $Q\ Syn_8$
+   231,                  pm Syn_8,              $P_m\ Syn_8$
+   232,                  vf Syn_8,              $V_f\ Syn_8$
+   233,                  Id Syn_8,              $I_d\ Syn_8$
+   234,                  Iq Syn_8,              $I_q\ Syn_8$
+   235,                  vd Syn_8,              $V_d\ Syn_8$
+   236,                  vq Syn_8,              $V_q\ Syn_8$
+   237,                psid Syn_8,           $\psi_d\ Syn_8$
+   238,                psiq Syn_8,           $\psi_q\ Syn_8$
+   239,                wref TG1 1,    $\omega_{ref}\ TG1\ 1$
+   240,                pout TG1 1,         $P_{out}\ TG1\ 1$
+   241,                 pin TG1 1,          $P_{in}\ TG1\ 1$
+   242,                wref TG1 2,    $\omega_{ref}\ TG1\ 2$
+   243,                pout TG1 2,         $P_{out}\ TG1\ 2$
+   244,                 pin TG1 2,          $P_{in}\ TG1\ 2$
+   245,                ref1 VSC 1,           $ref_1\ VSC\ 1$
+   246,                ref2 VSC 1,            $ref2\ VSC\ 1$
+   247,                  vd VSC 1,             $v_d\ VSC\ 1$
+   248,                  vq VSC 1,             $v_q\ VSC\ 1$
+   249,                   p VSC 1,               $P\ VSC\ 1$
+   250,                   q VSC 1,               $Q\ VSC\ 1$
+   251,               Idref VSC 1,       $I_d^{ref}\ VSC\ 1$
+   252,               Iqref VSC 1,       $I_q^{ref}\ VSC\ 1$
+   253,                Idcy VSC 1,         $I_{dcy}\ VSC\ 1$
+   254,                 adq VSC 1,      $\theta{dq}\ VSC\ 1$
+   255,                ref1 VSC 2,           $ref_1\ VSC\ 2$
+   256,                ref2 VSC 2,            $ref2\ VSC\ 2$
+   257,                  vd VSC 2,             $v_d\ VSC\ 2$
+   258,                  vq VSC 2,             $v_q\ VSC\ 2$
+   259,                   p VSC 2,               $P\ VSC\ 2$
+   260,                   q VSC 2,               $Q\ VSC\ 2$
+   261,               Idref VSC 2,       $I_d^{ref}\ VSC\ 2$
+   262,               Iqref VSC 2,       $I_q^{ref}\ VSC\ 2$
+   263,                Idcy VSC 2,         $I_{dcy}\ VSC\ 2$
+   264,                 adq VSC 2,      $\theta{dq}\ VSC\ 2$
+   265,                ref1 VSC 3,           $ref_1\ VSC\ 3$
+   266,                ref2 VSC 3,            $ref2\ VSC\ 3$
+   267,                  vd VSC 3,             $v_d\ VSC\ 3$
+   268,                  vq VSC 3,             $v_q\ VSC\ 3$
+   269,                   p VSC 3,               $P\ VSC\ 3$
+   270,                   q VSC 3,               $Q\ VSC\ 3$
+   271,               Idref VSC 3,       $I_d^{ref}\ VSC\ 3$
+   272,               Iqref VSC 3,       $I_q^{ref}\ VSC\ 3$
+   273,                Idcy VSC 3,         $I_{dcy}\ VSC\ 3$
+   274,                 adq VSC 3,      $\theta{dq}\ VSC\ 3$
+   275,                   p VSC 4,               $P\ VSC\ 4$
+   276,                   q VSC 4,               $Q\ VSC\ 4$
+   277,                  vd VSC 4,             $v_d\ VSC\ 4$
+   278,                  vq VSC 4,             $v_q\ VSC\ 4$
+   279,                ref1 VSC 4,           $ref_1\ VSC\ 4$
+   280,                ref2 VSC 4,           $ref_2\ VSC\ 4$
+   281,               Idref VSC 4,       $I_d^{ref}\ VSC\ 4$
+   282,               Iqref VSC 4,       $I_q^{ref}\ VSC\ 4$

@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     pmu.set_header()  # This will load default header message "Hello I'm tinyPMU!"
 
-    data_file = DataFile(1411,pmu,"ieee14_vsc_wtg_out.dat", "ieee14_vsc_wtg_out.lst", loop=True)
+    data_file = DataFile(1411,pmu,"ieee14_vsc_out.dat", "ieee14_vsc_out.lst", loop=True)
 
     pmu.run()  # PMU starts listening for incoming connections
 

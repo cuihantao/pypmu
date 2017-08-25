@@ -48,7 +48,7 @@ class DataFile(object):
     def read_data_file(self):
         """Reads a line of data from file provided. Starts send data function as a child
         process that sends the slice of data as it is being read. """
-        index = 2
+        index = 1
         time = 0.0
 
         while self.send:
@@ -56,7 +56,7 @@ class DataFile(object):
             if line == "":
                 linecache.checkcache(self.datFile)        ##Refreshes file contents
                 if self.loop:
-                    index = 2
+                    index = 1
                     continue
                 sleep(0.1)
                 time += 0.1
@@ -150,7 +150,7 @@ class DataFile(object):
         self.datFile = datFile
 
         dat = open(datFile, "r")
-        self.num_col = int(dat.readline())##number of columns, AKA num of vars
+        self.num_col = len(dat.readline().split())##number of columns, AKA num of vars
         dat.close()
 
     def set_lst_file(self, lstFile):
