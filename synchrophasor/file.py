@@ -99,7 +99,7 @@ class DataFile(object):
                     alist.append(phasors[j])
                     alist2.append(alist)
                     alist = []
-                self.pmu.send_data(alist2, [[]]*14, [[]]*14, freq, [0]*14, stat)
+                self.pmu.send_data(alist2, [[]]*self.num_pmu, [[]]*self.num_pmu, freq, [0]*self.num_pmu, stat)
             else:
                 if self.data_format[0]:
                     phasors = (float(line[self.vmIndexes[0]]), float(line[self.amIndexes[0]]))

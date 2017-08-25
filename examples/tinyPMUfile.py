@@ -9,27 +9,54 @@ measurements - fixed (sample) measurement will
 be sent.
 """
 
+case_name = 'WECC_OSI'
+bus_range = slice(0, 181)
+
+dat = case_name + '_out.dat'
+lst = case_name + '_out.lst'
+
+
+def bus_names_from_lst(lst):
+    """Extract bus names from Andes lst file"""
+    names = list()
+    with open(lst, 'r') as f:
+        raw_data = f.read()
+    raw_data = raw_data.split('\n')
+
+    for line in raw_data:
+        if '$\\theta\\' in line:
+            tmp1 = line.split('theta')[1]
+            names.append(tmp1.split(',')[0].strip())
+
+    return names, len(names)
+
 
 if __name__ == "__main__":
-##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
+    # TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
     pmu = Pmu(ip="0.0.0.0", port=1410)
     pmu.logger.setLevel("DEBUG")
 
-    station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
-                                                           "Station K", "Station L", "Station M", "Station N"]
-    phasor_ids = [1]*14
-    data_format = [(True, True, True, True)] * 14
+    # station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
+    #                                                        "Station K", "Station L", "Station M", "Station N"]
+    # station_names = ["Station " + str(i) for i in range(nBus)]
 
-    channel_names = [["aname!"]] * 14
-    ph_units = [[(915527, "v")]] * 14
+    station_names, nBus = bus_names_from_lst(lst)
+    station_names = station_names[bus_range]
+    nbus = len(station_names)
 
-    an_units = [[]]*14
-    dig_units = [[]]*14
-    fnom = [60]*14
-    cfgcount = [1]*14
+    phasor_ids = [1]*nBus
+    data_format = [(True, True, True, True)] * nBus
 
-    cfg = ConfigFrame2(7734, 1000000, 14, station_names, phasor_ids, data_format,
-                                          phasor_ids, [0]*14, [0]*14,
+    channel_names = [["aname!"]] * nBus
+    ph_units = [[(915527, "v")]] * nBus
+
+    an_units = [[]]*nBus
+    dig_units = [[]]*nBus
+    fnom = [60]*nBus
+    cfgcount = [1]*nBus
+
+    cfg = ConfigFrame2(7734, 1000000, nBus, station_names, phasor_ids, data_format,
+                                          phasor_ids, [0]*nBus, [0]*nBus,
                                          channel_names,
                                          ph_units,
                                          an_units,
@@ -40,7 +67,7 @@ if __name__ == "__main__":
 
     pmu.set_header()  # This will load default header message "Hello I'm tinyPMU!"
 
-    data_file = DataFile(1411,pmu,"ieee14_vsc_out.dat", "ieee14_vsc_out.lst", loop=True)
+    data_file = DataFile(1411, pmu, dat, lst, loop=True)
 
     pmu.run()  # PMU starts listening for incoming connections
 
