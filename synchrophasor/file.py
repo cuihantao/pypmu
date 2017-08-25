@@ -14,7 +14,7 @@ class DataFile(object):
     the send thread will transmit the data at the data rate. If the read function
     does not see new lines of data within the timeout period, it will stop"""
     ##TODO: Support for multiple class instances of PMU's for multiport streaming
-    def __init__(self, port, pmu, datFile, lstFile, timeout=10):
+    def __init__(self, port, pmu, datFile, lstFile, timeout=10, loop=False):
         self.set_pmu(pmu)
         self.set_ports(port)
         self.set_dat_file(datFile)
@@ -24,6 +24,7 @@ class DataFile(object):
         self.send = False
         self.buffer = True
         self.timeout = timeout
+        self.loop = loop
         self.buffer = Queue() ##TODO: multiple client support
 
         self.data_rate = self.pmu.cfg2.get_data_rate()
@@ -54,6 +55,9 @@ class DataFile(object):
             line = linecache.getline(self.datFile, index)
             if line == "":
                 linecache.checkcache(self.datFile)        ##Refreshes file contents
+                if self.loop:
+                    index = 2
+                    continue
                 sleep(0.1)
                 time += 0.1
                 if time > self.timeout:
@@ -89,14 +93,13 @@ class DataFile(object):
                     else:
                         phasors.append((float(line[self.amIndexes[k]]), float(line[self.vmIndexes[k]])))
                     freq.append(float(line[self.wBusFreqIndexes[k]])*self.pmu.cfg2.get_fnom()[k])
-                    print(freq)
+                    # print(freq)
                 for j in range(len(phasors)):
                     alist = []
                     alist.append(phasors[j])
                     alist2.append(alist)
                     alist = []
                 self.pmu.send_data(alist2, [[]]*14, [[]]*14, freq, [0]*14, stat)
-                sleep(self.delay)
             else:
                 if self.data_format[0]:
                     phasors = (float(line[self.vmIndexes[0]]), float(line[self.amIndexes[0]]))
@@ -104,7 +107,6 @@ class DataFile(object):
                     phasors = (float(line[self.amIndexes[0]]), (float(line[self.vmIndexes[0]])))
                 freq = float(line[self.wBusFreqIndexes[0]])
                 self.pmu.send_data(phasors, [], [], freq*self.pmu.cfg2.get_fnom()[k])
-                sleep(self.delay)
         print("Write thread complete.")
 
     def get_col_indexes(self, lstFile):

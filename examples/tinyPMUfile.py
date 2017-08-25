@@ -12,7 +12,7 @@ be sent.
 
 if __name__ == "__main__":
 ##TODO: support for non-multistreaming here. Also, replace hard coding with actual values from file.
-    pmu = Pmu(ip="127.0.0.1", port=1411)
+    pmu = Pmu(ip="0.0.0.0", port=1410)
     pmu.logger.setLevel("DEBUG")
 
     station_names =  ["Station A", "Station B", "Station C", "Station D", "Station E", "Station F", "Station G", "Station H", "Station I", "Station J",
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     pmu.set_header()  # This will load default header message "Hello I'm tinyPMU!"
 
-    data_file = DataFile(1411,pmu,"ieee14_vsc_wtg_out.dat", "ieee14_vsc_wtg_out.lst")
+    data_file = DataFile(1411,pmu,"ieee14_vsc_wtg_out.dat", "ieee14_vsc_wtg_out.lst", loop=True)
 
     pmu.run()  # PMU starts listening for incoming connections
 
