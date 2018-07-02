@@ -3,7 +3,7 @@
 import time
 import os
 
-from synchrophasor.pdc import Pdc
+from pypmu.pdc import Pdc
 from argparse import ArgumentParser
 from datetime import datetime
 from time import sleep

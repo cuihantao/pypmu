@@ -1,4 +1,4 @@
-from synchrophasor.splitter import StreamSplitter
+from pypmu.splitter import StreamSplitter
 
 """
 StreamSplitter will pass source data stream to each connected PDC.

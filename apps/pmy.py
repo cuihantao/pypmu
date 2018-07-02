@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from synchrophasor.pmu import Pmu
+from pypmu.pmu import Pmu
 from argparse import ArgumentParser
 
 """

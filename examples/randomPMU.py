@@ -1,5 +1,5 @@
-from synchrophasor.pmu import Pmu
-from synchrophasor.frame import ConfigFrame2
+from pypmu.pmu import Pmu
+from pypmu.frame import ConfigFrame2
 import random
 
 """
@@ -8,7 +8,7 @@ After request to start sending measurements - random
 values for phasors will be sent.
 """
 
-pmu = Pmu(ip="127.0.0.1", port=1410)
+pmu = Pmu(ip="0.0.0.0", port=1410)
 
 cfg = ConfigFrame2(1410,  # PMU_ID
                    1000000,  # TIME_BASE

@@ -14,8 +14,8 @@ Data Transfer for Power Systems.
 """
 
 from abc import ABCMeta, abstractmethod
-from synchrophasor.utils import crc16xmodem
-from synchrophasor.utils import list2bytes
+from pypmu.utils import crc16xmodem
+from pypmu.utils import list2bytes
 from struct import pack, unpack
 from time import time
 import collections

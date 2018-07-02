@@ -1,8 +1,8 @@
 import binascii
-from synchrophasor.frame import DataFrame
-from synchrophasor.frame import ConfigFrame2
-from synchrophasor.frame import HeaderFrame
-from synchrophasor.frame import CommandFrame
+from pypmu.frame import DataFrame
+from pypmu.frame import ConfigFrame2
+from pypmu.frame import HeaderFrame
+from pypmu.frame import CommandFrame
 
 __author__ = "Stevan Sandi"
 __copyright__ = "Copyright (c) 2016, Tomo Popovic, Stevan Sandi, Bozo Krstajic"

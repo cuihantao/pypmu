@@ -2,7 +2,7 @@ import logging
 import socket
 
 from sys import stdout
-from synchrophasor.frame import *
+from pypmu.frame import *
 
 __author__ = "Stevan Sandi"
 __copyright__ = "Copyright (c) 2016, Tomo Popovic, Stevan Sandi, Bozo Krstajic"
@@ -59,7 +59,7 @@ class Pdc(object):
 
     def stop(self):
         """
-        Request from PMU to start sending data
+        Request from PMU to stop sending data
         :return: NoneType
         """
         start = CommandFrame(self.pdc_id, 'stop')
@@ -81,7 +81,6 @@ class Pdc(object):
             return header
         else:
             return None
-
     def get_config(self, version='cfg2'):
         """
         Request for Configuration frame.

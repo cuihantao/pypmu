@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-from synchrophasor.splitter import StreamSplitter
+from pypmu.splitter import StreamSplitter
 
 """
 splytter - will pass source data stream to each connected PDC.

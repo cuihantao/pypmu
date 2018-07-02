@@ -1,12 +1,12 @@
-from synchrophasor.pmu import Pmu
-from synchrophasor.frame import *
+from pypmu.pmu import Pmu
+from pypmu.frame import *
 
 """
 pyPMU is custom configured PMU simulator. Code below represents
 PMU described in IEEE C37.118.2 - Annex D.
 """
 
-pmu = Pmu(ip="127.0.0.1", port=9991)
+pmu = Pmu(ip="0.0.0.0", port=9991)
 
 ph_v_conversion = int(300000.0 / 32768 * 100000)  # Voltage phasor conversion factor
 ph_i_conversion = int(15000.0 / 32768 * 100000)  # Current phasor conversion factor

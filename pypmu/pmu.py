@@ -3,7 +3,7 @@ import threading
 import socket
 import logging
 
-from synchrophasor.frame import *
+from pypmu.frame import *
 from sys import stdout
 from select import select
 from time import sleep

@@ -4,7 +4,7 @@ import socket
 import logging
 
 from sys import stdout
-from synchrophasor.frame import *
+from pypmu.frame import *
 from select import select
 from time import time
 

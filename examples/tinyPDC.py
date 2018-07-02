@@ -1,4 +1,4 @@
-from synchrophasor.pdc import Pdc
+from pypmu.pdc import Pdc
 
 """
 tinyPDC will connect to pmu_ip:pmu_port and send request

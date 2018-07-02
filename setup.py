@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from distutils.core import setup
+
 try:
     import setuptools
 except ImportError:
@@ -10,7 +11,7 @@ setup(name='pypmu',
       description='Python-based PMU simulator',
       author='Stevan Sandi',
       url='https://github.com/cuihantao/pypmu',
-      packages=['synchrophasor'],
+      packages=['pypmu'],
       )
 
 
