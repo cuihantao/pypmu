@@ -6,7 +6,7 @@ for header message, configuration and eventually
 to start sending measurements.
 """
 
-pdc = Pdc(pdc_id=7, pmu_ip='127.0.0.1', pmu_port=1410)
+pdc = Pdc(pdc_id=7, pmu_ip='127.0.0.1', pmu_port=1414)
 
 pdc.run()  # Connect to PMU
 

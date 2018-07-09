@@ -16,11 +16,11 @@ class Pdc(object):
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
-    handler = logging.StreamHandler(stdout)
-    handler.setLevel(logging.DEBUG)
+    # handler = logging.StreamHandler(stdout)
+    # handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # handler.setFormatter(formatter)
+    # logger.addHandler(handler)
 
     def __init__(self, pdc_id=1, pmu_ip='127.0.0.1', pmu_port=4712, buffer_size=2048, method='tcp'):
 
