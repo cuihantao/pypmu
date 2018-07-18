@@ -19,13 +19,13 @@ __version__ = "0.1.1"
 class Pmu(object):
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
 
-    #handler = logging.StreamHandler(stdout)
-    #handler.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(stdout)
+    handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    #handler.setFormatter(formatter)
-    #logger.addHandler(handler)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     def pmu_handler(self, connection, address, buffer):
 
