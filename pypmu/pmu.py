@@ -18,16 +18,16 @@ __version__ = "0.1.1"
 
 class Pmu(object):
 
-    logger = logging.getLogger()
+    # logger = logging.getLogger()
     # logger.setLevel(logging.DEBUG)
+    #
+    # handler = logging.StreamHandler(stdout)
+    # handler.setLevel(logging.DEBUG)
+    # formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    # handler.setFormatter(formatter)
+    # logger.addHandler(handler)
 
-    handler = logging.StreamHandler(stdout)
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    def pmu_handler(self, connection, address, buffer):
+    def pmu_handler(self, connection, address, buffer, logger=None):
 
         self.logger.info("[%d] - Connection from %s:%d", self.pmu_id, address[0], address[1])
 
@@ -151,7 +151,8 @@ class Pmu(object):
             # Close the connection fd in the parent, since the child process has its own reference.
             conn.close()
 
-    def __init__(self, pmu_id=7734, data_rate=30, port=4712, ip='127.0.0.1', method='tcp', buffer_size=2048):
+    def __init__(self, pmu_id=7734, data_rate=30, port=4712, ip='127.0.0.1', method='tcp', buffer_size=2048,
+                 logger=None):
 
         self.port = port
         self.ip = ip
@@ -159,6 +160,16 @@ class Pmu(object):
         self.socket = None
         self.listener = None
         self.buffer_size = buffer_size
+        if logger is None:
+            self.logger = logging.getLogger()
+            self.logger.setLevel(logging.DEBUG)
+            handler = logging.StreamHandler(stdout)
+            handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+        else:
+            self.logger = logger
 
         self.ieee_cfg2_sample = ConfigFrame2(7734, 1000000, 1, "Station A", 7734, (False, False, True, False), 4, 3, 1,
                                              ["VA", "VB", "VC", "I1", "ANALOG1", "ANALOG2", "ANALOG3",
