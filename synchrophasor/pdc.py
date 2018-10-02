@@ -151,6 +151,43 @@ class Pdc(object):
 
         return received_message
 
+    def get_msg(self, queue):
+        received_data = b""
+        received_message = None
+
+        while len(received_data) < 4:
+            received_data += self.pmu_socket.recv(self.buffer_size)
+
+        bytes_received = len(received_data)
+        total_frame_size = int.from_bytes(received_data[2:4], byteorder="big", signed=False)
+
+        # Keep receiving until every byte of that message is received
+        while bytes_received < total_frame_size:
+            message_chunk = self.pmu_socket.recv(min(total_frame_size - bytes_received, self.buffer_size))
+
+            if not message_chunk:
+                break
+            received_data += message_chunk
+            bytes_received += len(message_chunk)
+
+        # If complete message is received try to decode it
+        if len(received_data) == total_frame_size:
+            try:
+                received_message = CommonFrame.convert2frame(received_data, self.pmu_cfg2)  # Try to decode received data
+                self.logger.debug("[%d] - Received %s from PMU (%s:%d)", self.pdc_id, type(received_message).__name__,
+                                  self.pmu_ip, self.pmu_port)
+            except FrameError:
+                self.logger.warning("[%d] - Received unknown message from PMU (%s:%d)",
+                                    self.pdc_id, self.pmu_ip, self.pmu_port)
+
+        #Queuepush(queue,received_message)
+        #print ('Before Queue put')
+        queue.put(received_message)
+        #print ('After Queue put')
+        #print (queue.get())
+        #print (received_message)
+
+        return received_message
 
     def quit(self):
         """
