@@ -6,7 +6,7 @@ be sent.
 """
 
 from synchrophasor.pmu import Pmu
-
+from multiprocessing import Process
 
 if __name__ == "__main__":
 

@@ -62,6 +62,7 @@ if __name__ == "__main__":
         if type(results) == DataFrame:
             print(results.get_measurements())
         data1.terminate()
+        data1.join()
 
         data2 = Process(target=pdc2.get_msg, args=(result_queue1,))
         data2.start()
@@ -69,6 +70,7 @@ if __name__ == "__main__":
         if type(results1) == DataFrame:
             print(results1.get_measurements())
         data2.terminate()
+        data2.join()
 
         data3 = Process(target=pdc3.get_msg, args=(result_queue2,))
         data3.start()
@@ -76,3 +78,4 @@ if __name__ == "__main__":
         if type(results2) == DataFrame:
             print(results2.get_measurements())
         data3.terminate()
+        data3.join()

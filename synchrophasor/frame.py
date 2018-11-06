@@ -2378,6 +2378,11 @@ class DataFrame(CommonFrame):
 
         return data_frame
 
+    def time_mod(self,data_frame):
+        new_data_frame = { "pmu_id":data_frame['pmu_id'],
+                           "time": self.get_soc() + self.get_frasec()[0] / self.cfg.get_time_base(),
+                           "measurements": data_frame['measurements'] }
+        return new_data_frame
 
     def convert2bytes(self):
 
