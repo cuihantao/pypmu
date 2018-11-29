@@ -6,7 +6,7 @@ from threading import Thread
 from multiprocessing import Queue
 from multiprocessing import Process
 from sys import stdout
-from time import sleep
+from time import sleep, time
 from synchrophasor.frame import *
 
 
@@ -37,7 +37,9 @@ class Pmu(object):
         self.listener = None
         self.set_timestamp = set_timestamp
         self.buffer_size = buffer_size
-        self.delay = (1.0 / data_rate) if data_rate > 0 else -data_rate
+
+        # `self.delay` is multiplied by a coefficient to compensate for the execution delay
+        self.delay = 0.7 * (1.0 / data_rate) if data_rate > 0 else -data_rate
 
         self.ieee_cfg2_sample = ConfigFrame2(pmu_id, 1000000, 1, "Station A", 7734, (False, False, True, False),
                                              4, 3, 1,
@@ -134,7 +136,7 @@ class Pmu(object):
         # Configuration changed - Notify all PDCs about new configuration
         self.send(self.cfg2)
         # self.send(self.cfg3)
-        self.delay = (1.0 / data_rate) if data_rate > 0 else -data_rate
+        self.delay = 0.7 * (1.0 / data_rate) if data_rate > 0 else -data_rate
 
         self.logger.info("[%d] - PMU reporting data rate changed.", self.cfg2.get_id_code())
 
@@ -232,6 +234,12 @@ class Pmu(object):
             process.start()
             self.clients.append(process)
 
+            self.logger.info('started processes={}'.format(len(self.clients)))
+            for client in self.clients:
+                if not client.is_alive():
+                    client.join()
+                    self.clients.remove(client)
+
             # Close the connection fd in the parent, since the child process has its own reference.
             conn.close()
 
@@ -246,6 +254,9 @@ class Pmu(object):
     def pdc_handler(connection, address, buffer, pmu_id, data_rate, cfg1, cfg2, cfg3, header,
                     buffer_size, set_timestamp, log_level):
 
+        t0 = time()  # last action time
+        started = False
+        time_out = 30
         # Recreate Logger (handler implemented as static method due to Windows process spawning issues)
         logger = logging.getLogger(address[0]+str(address[1]))
         logger.setLevel(log_level)
@@ -261,12 +272,13 @@ class Pmu(object):
 
         # Calculate delay between data frames
         if data_rate > 0:
-            delay = 1.0 / data_rate
+            # delay = 1.0 / data_rate
+            delay = 0.7 * (1.0 / data_rate)
         else:
             delay = -data_rate
 
         try:
-            while True:
+            while time() - t0 <= time_out:
 
                 command = None
                 received_data = b""
@@ -278,6 +290,7 @@ class Pmu(object):
                     Should get this in first iteration. FRAMESIZE is needed to determine when one complete message
                     has been received.
                     """
+                    t0 = time()  # update last action time
                     while len(received_data) < 4:
                         received_data += connection.recv(buffer_size)
 
@@ -310,13 +323,17 @@ class Pmu(object):
                         logger.warning("[%d] - Message not received completely <- (%s:%d)", pmu_id, address[0], address[1])
 
                 if command:
+                    t0 = time()  # update last action time
                     if command == "start":
                         sending_measurements_enabled = True
                         logger.info("[%d] - Start sending -> (%s:%d)", pmu_id, address[0], address[1])
+                        started = True
 
                     elif command == "stop":
                         logger.info("[%d] - Stop sending -> (%s:%d)", pmu_id, address[0], address[1])
                         sending_measurements_enabled = False
+                        if started:
+                            break
 
                     elif command == "header":
                         if set_timestamp: header.set_time()
@@ -343,7 +360,7 @@ class Pmu(object):
                                     pmu_id, address[0], address[1])
 
                 if sending_measurements_enabled and not buffer.empty():
-
+                    t0 = time()  # update last action time
                     data = buffer.get()
                     if isinstance(data, CommonFrame):  # If not raw bytes convert to bytes
                         if set_timestamp: data.set_time()
