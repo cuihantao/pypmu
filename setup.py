@@ -1,5 +1,6 @@
 import sys
 from distutils.core import setup
+import setuptools 
 
 
 if not sys.version_info[0] == 3:

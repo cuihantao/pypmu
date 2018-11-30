@@ -195,7 +195,7 @@ class Pmu(object):
                 buffer.put(data_frame)
             sleep(self.delay)
         else:
-            sleep(1) # Reduces CPU usage when there are no active connections
+            sleep(1)  # Reduces CPU usage when there are no active connections
 
     def run(self):
 
@@ -212,6 +212,16 @@ class Pmu(object):
         self.listener.daemon = True
         self.listener.start()
 
+        self.cleaner = Thread(target=self.client_join)
+        self.cleaner.daemon = True
+        self.cleaner.start()
+
+    def client_join(self):
+        for idx, client in enumerate(self.clients):
+            if not client.is_alive():
+                client.join()
+                self.clients.remove(client)
+                self.logger.info('clinet {} terminated and removed'.format(idx))
 
     def acceptor(self):
 
@@ -235,10 +245,6 @@ class Pmu(object):
             self.clients.append(process)
 
             self.logger.info('started processes={}'.format(len(self.clients)))
-            for client in self.clients:
-                if not client.is_alive():
-                    client.join()
-                    self.clients.remove(client)
 
             # Close the connection fd in the parent, since the child process has its own reference.
             conn.close()
@@ -255,8 +261,10 @@ class Pmu(object):
                     buffer_size, set_timestamp, log_level):
 
         t0 = time()  # last action time
-        started = False
-        time_out = 30
+        t_recv = time()  # last receive time
+        started = 0
+        time_out = 10
+        mini_timeout = 2
         # Recreate Logger (handler implemented as static method due to Windows process spawning issues)
         logger = logging.getLogger(address[0]+str(address[1]))
         logger.setLevel(log_level)
@@ -278,11 +286,14 @@ class Pmu(object):
             delay = -data_rate
 
         try:
-            while time() - t0 <= time_out:
-
+            while True:
                 command = None
                 received_data = b""
                 readable, writable, exceptional = select([connection], [], [], 0)  # Check for client commands
+
+                if time() - t0 > time_out:
+                    logger.info('Time out occurred')
+                    break
 
                 if readable:
                     """
@@ -290,9 +301,17 @@ class Pmu(object):
                     Should get this in first iteration. FRAMESIZE is needed to determine when one complete message
                     has been received.
                     """
-                    t0 = time()  # update last action time
-                    while len(received_data) < 4:
+                    # while len(received_data) < 4 and (time() - t0 <= time_out):
+
+                    t_recv = time()
+                    while True:
                         received_data += connection.recv(buffer_size)
+
+                        if len(received_data) >= 4:
+                            t0 = time()  # update last successful read time
+                            break
+                        if time() - t_recv > mini_timeout:
+                            break
 
                     bytes_received = len(received_data)
                     total_frame_size = int.from_bytes(received_data[2:4], byteorder="big", signed=False)
@@ -327,13 +346,13 @@ class Pmu(object):
                     if command == "start":
                         sending_measurements_enabled = True
                         logger.info("[%d] - Start sending -> (%s:%d)", pmu_id, address[0], address[1])
-                        started = True
+                        # started += 1
 
                     elif command == "stop":
                         logger.info("[%d] - Stop sending -> (%s:%d)", pmu_id, address[0], address[1])
                         sending_measurements_enabled = False
-                        if started:
-                            break
+                        # if started >= 1:
+                        #     break
 
                     elif command == "header":
                         if set_timestamp: header.set_time()
@@ -359,8 +378,11 @@ class Pmu(object):
                         logger.info("[%d] - Requested Configuration frame 3 sent -> (%s:%d)",
                                     pmu_id, address[0], address[1])
 
-                if sending_measurements_enabled and not buffer.empty():
+                if sending_measurements_enabled:
                     t0 = time()  # update last action time
+                    if buffer.empty():
+                        continue
+
                     data = buffer.get()
                     if isinstance(data, CommonFrame):  # If not raw bytes convert to bytes
                         if set_timestamp: data.set_time()
