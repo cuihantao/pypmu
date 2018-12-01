@@ -17,18 +17,25 @@ __license__ = "BSD-3"
 __version__ = "1.0.0-alpha"
 
 
+
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+
 class Pmu(object):
-
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    handler = logging.StreamHandler(stdout)
-    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    logger.setLevel(logging.ERROR)
 
+    # handler = logging.StreamcHandler(stdout)
+    # handler.setFormatter(formatter)
+    # logger.addHandler(handler)
 
     def __init__(self, pmu_id=7734, data_rate=30, port=4712, ip="127.0.0.1",
                  method="tcp", buffer_size=2048, set_timestamp=True):
+
+        file_handler = logging.FileHandler('/tmp/pmu-{}.log'.format(pmu_id))
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
+
+        self.logger.info('system starts')
 
         self.port = port
         self.ip = ip
@@ -212,14 +219,15 @@ class Pmu(object):
         self.listener.daemon = True
         self.listener.start()
 
-        self.cleaner = Thread(target=self.client_join)
-        self.cleaner.daemon = True
-        self.cleaner.start()
+        # self.cleaner = Thread(target=self.client_join)
+        # self.cleaner.daemon = True
+        # self.cleaner.start()
 
     def client_join(self):
+        self.logger.info('called join client')
         for idx, client in enumerate(self.clients):
             if not client.is_alive():
-                client.join()
+                client.join(0.1)
                 self.clients.remove(client)
                 self.logger.info('clinet {} terminated and removed'.format(idx))
 
@@ -244,8 +252,13 @@ class Pmu(object):
             process.start()
             self.clients.append(process)
 
-            self.logger.info('started processes={}'.format(len(self.clients)))
+            try:
+                self.client_join()
+            except Exception as e:
+                self.logger.exception(e)
+                print(e)
 
+            self.logger.info('current number of clients={}'.format(len(self.clients)))
             # Close the connection fd in the parent, since the child process has its own reference.
             conn.close()
 
@@ -253,6 +266,7 @@ class Pmu(object):
     def join(self):
 
         while self.listener.is_alive():
+            self.logger.info('pmu.join() called')
             self.listener.join(0.5)
 
 
@@ -263,8 +277,9 @@ class Pmu(object):
         t0 = time()  # last action time
         t_recv = time()  # last receive time
         started = 0
-        time_out = 10
-        mini_timeout = 2
+        time_out = 5
+        mini_timeout = 1
+
         # Recreate Logger (handler implemented as static method due to Windows process spawning issues)
         logger = logging.getLogger(address[0]+str(address[1]))
         logger.setLevel(log_level)
@@ -272,6 +287,12 @@ class Pmu(object):
         formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
+        # TODO: fix the duplicate file handler
+        file_handler = logging.FileHandler('/tmp/pmu-{}.log'.format(pmu_id))
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
 
         logger.info("[%d] - Connection from %s:%d", pmu_id, address[0], address[1])
 
@@ -304,13 +325,17 @@ class Pmu(object):
                     # while len(received_data) < 4 and (time() - t0 <= time_out):
 
                     t_recv = time()
+                    mini_timed_out = False
+
                     while True:
                         received_data += connection.recv(buffer_size)
 
                         if len(received_data) >= 4:
                             t0 = time()  # update last successful read time
+                            # logger.info('updated t0 in reading data')
                             break
-                        if time() - t_recv > mini_timeout:
+                        if time() - t_recv >= mini_timeout:
+                            mini_timed_out = True
                             break
 
                     bytes_received = len(received_data)
@@ -337,22 +362,21 @@ class Pmu(object):
                                 logger.info("[%d] - Received [%s] <- (%s:%d)", pmu_id,
                                             type(received_message).__name__, address[0], address[1])
                         except FrameError:
-                            logger.warning("[%d] - Received unknown message <- (%s:%d)", pmu_id, address[0], address[1])
+                            logger.info("[%d] - Received unknown message <- (%s:%d)", pmu_id, address[0], address[1])
                     else:
-                        logger.warning("[%d] - Message not received completely <- (%s:%d)", pmu_id, address[0], address[1])
+                        logger.info("[%d] - Message not received completely <- (%s:%d)", pmu_id, address[0], address[1])
 
                 if command:
                     t0 = time()  # update last action time
+                    # logger.info('t0 updated in command')
+
                     if command == "start":
                         sending_measurements_enabled = True
                         logger.info("[%d] - Start sending -> (%s:%d)", pmu_id, address[0], address[1])
-                        # started += 1
 
                     elif command == "stop":
                         logger.info("[%d] - Stop sending -> (%s:%d)", pmu_id, address[0], address[1])
                         sending_measurements_enabled = False
-                        # if started >= 1:
-                        #     break
 
                     elif command == "header":
                         if set_timestamp: header.set_time()
@@ -379,7 +403,9 @@ class Pmu(object):
                                     pmu_id, address[0], address[1])
 
                 if sending_measurements_enabled:
-                    t0 = time()  # update last action time
+                    if not mini_timed_out:
+                        t0 = time()  # update last action time
+                        # logger.info('t0 updated in sending measurement')
                     if buffer.empty():
                         continue
 
@@ -394,6 +420,7 @@ class Pmu(object):
                                  pmu_id, time(), address[0], address[1])
 
         except Exception as e:
+            logger.exception(e)
             print(e)
         finally:
             connection.close()
